@@ -30,8 +30,9 @@ jobs:
             > The app isn't code-signed yet. On Windows, click **More info → Run anyway** if SmartScreen warns you.
             > On macOS, right-click the app and choose **Open** the first time (or run `xattr -cr /Applications/Paperwork.app`).
         run: |
-          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --draft --verify-tag --title "Paperwork $TAG" --notes "$NOTES"
-          echo "id=$(gh api "repos/$GITHUB_REPOSITORY/releases" --jq ".[] | select(.tag_name == \"$TAG\") | .id")" >> "$GITHUB_OUTPUT"
+          id=$(gh api "repos/$GITHUB_REPOSITORY/releases" -f tag_name="$TAG" -f name="Paperwork $TAG" -f body="$NOTES" -F draft=true --jq .id)
+          test -n "$id" || { echo "Could not create release"; exit 1; }
+          echo "id=$id" >> "$GITHUB_OUTPUT"
 
   build:
     needs: create-release
