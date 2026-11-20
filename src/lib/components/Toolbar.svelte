@@ -2,6 +2,7 @@
   import {
     CalendarDays,
     Check,
+    Circle,
     ChevronDown,
     Download,
     Eraser,
@@ -41,6 +42,7 @@
     { id: "date", label: "Date", key: "D", icon: CalendarDays },
     { id: "check", label: "Check", key: "X", icon: Check },
     { id: "cross", label: "Cross", key: "C", icon: X },
+    { id: "circle", label: "Circle", key: "E", icon: Circle },
     { id: "whiteout", label: "Whiteout", key: "W", icon: Eraser },
     { id: "highlight", label: "Highlight", key: "H", icon: Highlighter },
   ];
@@ -78,7 +80,7 @@
 
   <div class="tools" role="toolbar" aria-label="Tools">
     {#each tools as t, i (t.id)}
-      {#if i === 1 || i === 5 || i === 7}<span class="sep"></span>{/if}
+      {#if i === 1 || i === 5 || i === 8}<span class="sep"></span>{/if}
       <div class="tool-wrap">
         <button
           class="tool"

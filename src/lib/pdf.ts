@@ -323,6 +323,20 @@ export async function exportPdf(input: ExportInput): Promise<ExportResult> {
         });
         break;
       }
+      case "ellipse": {
+        // Outline only (no `color` key, so pdf-lib doesn't fill it). The stroke sits inside the box,
+        // matching the editor, and the ellipse is centered so it rotates with the page correctly.
+        const inset = item.strokeWidth / 2;
+        page.drawEllipse({
+          ...toPdf(item.x + item.w / 2, item.y + item.h / 2),
+          xScale: Math.max(0.5, item.w / 2 - inset),
+          yScale: Math.max(0.5, item.h / 2 - inset),
+          borderColor: hex(item.color),
+          borderWidth: item.strokeWidth,
+          rotate,
+        });
+        break;
+      }
     }
   }
 

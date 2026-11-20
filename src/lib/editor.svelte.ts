@@ -53,6 +53,7 @@ class Editor {
   // --- defaults for new items (remembered between placements) ---
   textDefaults = $state({ fontSize: 12, font: "helvetica" as TextItem["font"], color: INK_COLORS[0] });
   symbolSize = $state(14);
+  circleDefaults = $state({ color: INK_COLORS[2], strokeWidth: 2 });
 
   // --- view ---
   zoom = $state(1);
@@ -435,9 +436,20 @@ class Editor {
   /** Change text style of the selected item and remember it for new text. */
   styleText(patch: Partial<Pick<TextItem, "fontSize" | "font" | "color">>) {
     const sel = this.selected;
+    if (sel?.type === "ellipse") {
+      if (patch.color) this.styleCircle({ color: patch.color });
+      return;
+    }
     if (sel?.type === "text") this.update(sel.id, patch);
     else if (sel?.type === "symbol" && patch.color) this.update(sel.id, { color: patch.color });
     Object.assign(this.textDefaults, patch);
+  }
+
+  /** Change the selected circle and remember the style for new circles. */
+  styleCircle(patch: Partial<{ color: string; strokeWidth: number }>) {
+    const sel = this.selected;
+    if (sel?.type === "ellipse") this.update(sel.id, patch);
+    Object.assign(this.circleDefaults, patch);
   }
 
   // -------------------------------------------------------------------------

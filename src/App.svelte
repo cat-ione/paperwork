@@ -178,6 +178,7 @@
       d: "date",
       x: "check",
       c: "cross",
+      e: "circle",
       w: "whiteout",
       h: "highlight",
     };

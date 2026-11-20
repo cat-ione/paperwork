@@ -79,11 +79,13 @@
     return { x: (e.clientX - r.left) / z, y: (e.clientY - r.top) / z };
   }
 
+  const isDrawTool = (t: string) => t === "whiteout" || t === "highlight" || t === "circle";
+
   function onToolDown(e: PointerEvent) {
     if (e.button !== 0) return;
     e.preventDefault();
     const p = toView(e);
-    if (editor.tool === "whiteout" || editor.tool === "highlight") {
+    if (isDrawTool(editor.tool)) {
       draft = { x0: p.x, y0: p.y, x: p.x, y: p.y, w: 0, h: 0 };
       (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
       return;
@@ -95,9 +97,25 @@
   function onToolMove(e: PointerEvent) {
     const p = toView(e);
     if (draft) {
-      const x = Math.max(0, Math.min(p.x, page.width));
-      const y = Math.max(0, Math.min(p.y, page.height));
-      draft = { ...draft, x: Math.min(draft.x0, x), y: Math.min(draft.y0, y), w: Math.abs(x - draft.x0), h: Math.abs(y - draft.y0) };
+      let dx = Math.max(0, Math.min(p.x, page.width)) - draft.x0;
+      let dy = Math.max(0, Math.min(p.y, page.height)) - draft.y0;
+      if (editor.tool === "circle" && e.shiftKey) {
+        // Shift: a perfect circle, as large as the drag allows without leaving the page.
+        const room = Math.min(
+          dx < 0 ? draft.x0 : page.width - draft.x0,
+          dy < 0 ? draft.y0 : page.height - draft.y0,
+        );
+        const size = Math.min(Math.max(Math.abs(dx), Math.abs(dy)), room);
+        dx = Math.sign(dx || 1) * size;
+        dy = Math.sign(dy || 1) * size;
+      }
+      draft = {
+        ...draft,
+        x: Math.min(draft.x0, draft.x0 + dx),
+        y: Math.min(draft.y0, draft.y0 + dy),
+        w: Math.abs(dx),
+        h: Math.abs(dy),
+      };
     } else {
       ghost = p;
     }
@@ -105,27 +123,22 @@
 
   function onToolUp() {
     if (!draft) return;
-    const kind = editor.tool === "highlight" ? "highlight" : "whiteout";
+    const tool = editor.tool;
     let { x, y, w, h } = draft;
     if (w < 4 || h < 4) {
-      // A click rather than a drag: drop a sensible default box.
-      w = kind === "highlight" ? 120 : 100;
-      h = kind === "highlight" ? 16 : 20;
-      x = draft.x0 - w / 2;
-      y = draft.y0 - h / 2;
+      // A click rather than a drag: drop a sensible default size.
+      [w, h] = tool === "highlight" ? [120, 16] : tool === "circle" ? [90, 36] : [100, 20];
+      x = Math.max(0, Math.min(draft.x0 - w / 2, page.width - w));
+      y = Math.max(0, Math.min(draft.y0 - h / 2, page.height - h));
     }
     draft = null;
-    editor.add({
-      id: Math.random().toString(36).slice(2, 10),
-      type: "rect",
-      kind,
-      color: kind === "highlight" ? "#fde047" : "#ffffff",
-      page: page.index,
-      x,
-      y,
-      w,
-      h,
-    });
+    const base = { id: Math.random().toString(36).slice(2, 10), page: page.index, x, y, w, h };
+    if (tool === "circle") {
+      editor.add({ ...base, type: "ellipse", ...editor.circleDefaults });
+    } else {
+      const kind = tool === "highlight" ? "highlight" : "whiteout";
+      editor.add({ ...base, type: "rect", kind, color: kind === "highlight" ? "#fde047" : "#ffffff" });
+    }
     editor.tool = "select";
   }
 
@@ -177,6 +190,9 @@
         <div
           class="draft"
           class:hl={editor.tool === "highlight"}
+          class:ellipse={editor.tool === "circle"}
+          style:--stroke="{editor.circleDefaults.strokeWidth * z}px"
+          style:--ink={editor.circleDefaults.color}
           style:left="{draft.x * z}px"
           style:top="{draft.y * z}px"
           style:width="{draft.w * z}px"
@@ -275,6 +291,13 @@
     background: #fff;
     outline: 1.5px dashed var(--danger);
     box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.7);
+  }
+  .draft.ellipse {
+    background: transparent;
+    outline: none;
+    border: var(--stroke) solid var(--ink);
+    border-radius: 50%;
+    box-shadow: none;
   }
   .draft.hl {
     background: rgba(253, 224, 71, 0.45);

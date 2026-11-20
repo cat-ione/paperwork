@@ -38,7 +38,7 @@
     const target = e.currentTarget as HTMLElement;
     target.setPointerCapture(e.pointerId);
     const start = { cx: e.clientX, cy: e.clientY, x: item.x, y: item.y, w: item.w, h: item.h };
-    const keepRatio = item.type !== "rect";
+    const keepRatio = item.type === "image" || item.type === "symbol";
     let moved = false;
 
     const onMove = (ev: PointerEvent) => {
@@ -163,6 +163,30 @@
     </svg>
   {:else if item.type === "rect"}
     <div class="fill {item.kind}" style:background={item.color}></div>
+  {:else if item.type === "ellipse"}
+    {@const inset = item.strokeWidth / 2}
+    <svg class="ring" viewBox="0 0 {item.w} {item.h}" preserveAspectRatio="none">
+      <ellipse
+        cx={item.w / 2}
+        cy={item.h / 2}
+        rx={Math.max(0.5, item.w / 2 - inset)}
+        ry={Math.max(0.5, item.h / 2 - inset)}
+        fill="none"
+        stroke={item.color}
+        stroke-width={item.strokeWidth}
+      />
+      <!-- Wider invisible stroke so the outline is easy to grab. -->
+      <ellipse
+        class="hit"
+        cx={item.w / 2}
+        cy={item.h / 2}
+        rx={Math.max(0.5, item.w / 2 - inset)}
+        ry={Math.max(0.5, item.h / 2 - inset)}
+        fill="none"
+        stroke="transparent"
+        stroke-width={Math.max(item.strokeWidth, 10 / z)}
+      />
+    </svg>
   {/if}
 
   {#if selected && item.type !== "text"}
@@ -256,6 +280,27 @@
     mix-blend-mode: multiply;
   }
 
+  /* Circles: clicks inside pass through to whatever is circled; only the outline is grabbable. */
+  .item.ellipse {
+    pointer-events: none;
+  }
+  .item.ellipse .handle,
+  .item.ellipse :global(.bar) {
+    pointer-events: auto;
+  }
+  .ring {
+    overflow: visible;
+  }
+  .ring .hit {
+    pointer-events: stroke;
+    cursor: move;
+  }
+  .item.ellipse::after {
+    border-radius: 50%;
+  }
+  .item.ellipse.selected::after {
+    border-radius: 2px;
+  }
   .handle {
     position: absolute;
     width: 11px;

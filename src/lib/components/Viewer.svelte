@@ -64,7 +64,7 @@
   }
 
   const cursor = $derived(
-    editor.tool === "select" ? "default" : editor.tool === "whiteout" || editor.tool === "highlight" ? "crosshair" : "copy",
+    editor.tool === "select" ? "default" : editor.tool === "whiteout" || editor.tool === "highlight" || editor.tool === "circle" ? "crosshair" : "copy",
   );
 
   const hint = $derived.by(() => {
@@ -81,6 +81,8 @@
         return "Click to place signature";
       case "initials":
         return "Click to place initials";
+      case "circle":
+        return "Drag to circle · Shift for a perfect circle";
       case "whiteout":
         return "Drag to cover";
       case "highlight":

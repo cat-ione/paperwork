@@ -118,6 +118,7 @@
         <li><span class="kbd">I</span> Initials</li>
         <li><span class="kbd">D</span> Date</li>
         <li><span class="kbd">X</span> Check <span class="kbd">C</span> Cross</li>
+        <li><span class="kbd">E</span> Circle</li>
         <li><span class="kbd">W</span> Whiteout <span class="kbd">H</span> Highlight</li>
       </ul>
     </div>

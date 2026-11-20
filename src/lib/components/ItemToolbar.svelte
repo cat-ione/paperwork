@@ -18,6 +18,12 @@
     editor.styleText({ fontSize: size });
   }
 
+  function setStroke(delta: number) {
+    if (item.type !== "ellipse") return;
+    const width = Math.min(8, Math.max(0.5, item.strokeWidth + delta));
+    editor.styleCircle({ strokeWidth: width });
+  }
+
   // Keep focus in the text box while using the toolbar.
   function keepFocus(e: PointerEvent) {
     e.preventDefault();
@@ -41,7 +47,14 @@
     <span class="sep"></span>
   {/if}
 
-  {#if item.type === "text" || item.type === "symbol"}
+  {#if item.type === "ellipse"}
+    <button class="ib" aria-label="Thinner line" title="Thinner" onclick={() => setStroke(-0.5)}><Minus size={14} /></button>
+    <span class="size" title="Line thickness">{item.strokeWidth}</span>
+    <button class="ib" aria-label="Thicker line" title="Thicker" onclick={() => setStroke(0.5)}><Plus size={14} /></button>
+    <span class="sep"></span>
+  {/if}
+
+  {#if item.type === "text" || item.type === "symbol" || item.type === "ellipse"}
     {#each INK_COLORS as c (c)}
       <button
         class="swatch"

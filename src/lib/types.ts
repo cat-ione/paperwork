@@ -6,6 +6,7 @@ export type Tool =
   | "date"
   | "check"
   | "cross"
+  | "circle"
   | "whiteout"
   | "highlight";
 
@@ -47,7 +48,14 @@ export interface RectItem extends ItemBase {
   color: string;
 }
 
-export type Item = TextItem | ImageItem | SymbolItem | RectItem;
+/** Outline ellipse for circling things. The stroke is drawn inside the box. */
+export interface EllipseItem extends ItemBase {
+  type: "ellipse";
+  color: string;
+  strokeWidth: number;
+}
+
+export type Item = TextItem | ImageItem | SymbolItem | RectItem | EllipseItem;
 
 export interface PageInfo {
   index: number;

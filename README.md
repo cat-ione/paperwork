@@ -8,7 +8,7 @@ A desktop PDF editor for filling out forms and signing contracts. Built with Tau
 
 - **Fill form fields**: text, multiline, comb, checkboxes, radio buttons, dropdowns and list boxes, with a progress panel and "next empty field" navigation
 - **Signatures and initials**: draw, type (4 handwriting fonts) or upload, saved for reuse. Clicking a signature field fits the signature into it.
-- **Add text, dates, checkmarks/crosses, whiteout and highlights** anywhere on the page. Items can be moved, resized, restyled, duplicated and deleted.
+- **Add text, dates, checkmarks/crosses, circles, whiteout and highlights** anywhere on the page. Items can be moved, resized, restyled, duplicated and deleted.
 - **Save** (keeps fields editable), **Save as**, or **Save flattened copy** (locks everything in place)
 - 10 color schemes (Catppuccin Mocha by default, plus Macchiato, Frappé, Latte, Rosé Pine, Rosé Pine Dawn, Gruvbox, Nord, Tokyo Night, Solarized Light)
 - Undo/redo, zoom (Ctrl+wheel / pinch), page thumbnails, recent files, drag & drop, "Open with" support, and a prompt when closing with unsaved changes
@@ -40,7 +40,7 @@ The release workflow builds installers for Windows, macOS (Apple Silicon and Int
 | Key | Action |
 | --- | --- |
 | Ctrl+O / Ctrl+S / Ctrl+Shift+S | Open / Save / Save as |
-| V T S I D X C W H | Select, Text, Sign, Initials, Date, Check, Cross, Whiteout, Highlight |
+| V T S I D X C E W H | Select, Text, Sign, Initials, Date, Check, Cross, Circle (Shift = perfect circle), Whiteout, Highlight |
 | Del, Arrows (Shift = 10pt), Ctrl+D | Delete, nudge, duplicate the selected item |
 | Ctrl+Z / Ctrl+Y | Undo / Redo |
 | Ctrl+= / Ctrl+- / Ctrl+0 | Zoom in / out / fit width |

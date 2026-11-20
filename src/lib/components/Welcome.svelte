@@ -18,6 +18,8 @@
     ["d", "date"],
     ["x", "check"],
     ["c", "cross"],
+    ["e", "circle"],
+    ["v", "select"],
     ["w", "whiteout"],
     ["h", "highlight"],
     ["ctrl s", "save"],
