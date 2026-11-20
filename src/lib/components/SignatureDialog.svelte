@@ -13,9 +13,9 @@
   let remember = $state(true);
 
   const COLORS = [
-    { value: "#111111", label: "Black" },
-    { value: "#1d3fae", label: "Blue" },
-    { value: "#5b21b6", label: "Purple" },
+    { value: "#111111", label: "Carbon" },
+    { value: "#1d3fae", label: "Royal" },
+    { value: "#5b21b6", label: "Violet" },
   ];
   const FONTS = [
     { family: "Dancing Script", weight: 500, scale: 1 },
@@ -134,6 +134,12 @@
   };
   let typed = $state(defaultName());
   let font = $state(FONTS[0].family);
+  let nameInput = $state<HTMLInputElement>();
+
+  // Switching to the Type tab should let you start typing straight away.
+  $effect(() => {
+    if (mode === "type" && nameInput) nameInput.focus();
+  });
 
   // ---------------------------------------------------------------- upload ---
   let uploaded = $state<HTMLImageElement | null>(null);
@@ -269,8 +275,9 @@
   <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="sig-title">
     <header>
       <div>
-        <h2 id="sig-title">Create your {noun}</h2>
-        <p>{editor.signTarget ? `It will be placed in “${editor.signTarget.label}”.` : "Then click on the document to place it."}</p>
+        <span class="mono-label">Specimen {noun}</span>
+        <h2 id="sig-title" class="display">{kind === "signature" ? "Your signature, please." : "Your initials, please."}</h2>
+        <p>{editor.signTarget ? `It goes on “${editor.signTarget.label}”.` : "Afterwards, click on the document to place it."}</p>
       </div>
       <button class="icon-btn" aria-label="Close" onclick={cancel}><X size={18} /></button>
     </header>
@@ -287,43 +294,49 @@
       </button>
     </div>
 
-    <div class="body">
+    <div class="card">
       <div class="pane" class:hidden={mode !== "draw"}>
         <div class="pad" class:initials={kind === "initials"}>
           <canvas bind:this={canvas} onpointerdown={onDrawDown}></canvas>
-          <div class="baseline"><span>✕</span></div>
+          <div class="baseline"><span class="x">✕</span><span class="line-label mono-label">Signature of party</span></div>
           {#if !hasInk}
-            <div class="placeholder">Draw your {noun} here</div>
+            <div class="placeholder">sign above the line</div>
           {/if}
           {#if hasInk}
-            <button class="clear" onclick={clearDrawing}><RotateCcw size={13} /> Clear</button>
+            <button class="clear" onclick={clearDrawing}><RotateCcw size={13} /> Start over</button>
           {/if}
         </div>
       </div>
 
       {#if mode === "type"}
         <div class="pane">
-          <!-- svelte-ignore a11y_autofocus -->
           <input
+            bind:this={nameInput}
             class="name-input"
             bind:value={typed}
             placeholder={kind === "signature" ? "Type your full name" : "Type your initials"}
-            autofocus
             maxlength={kind === "signature" ? 60 : 6}
             onkeydown={(e) => e.key === "Enter" && canSubmit && submit()}
           />
-          <div class="fonts">
-            {#each FONTS as f (f.family)}
+          <div class="fonts" role="radiogroup" aria-label="Handwriting style">
+            {#each FONTS as f, i (f.family)}
               <button
                 class="font-card"
                 class:on={font === f.family}
+                role="radio"
+                aria-checked={font === f.family}
                 onclick={() => (font = f.family)}
-                style:font-family={`"${f.family}"`}
-                style:font-weight={f.weight}
-                style:font-size="{(kind === 'signature' ? 30 : 34) * f.scale}px"
-                style:color
               >
-                {typed.trim() || (kind === "signature" ? "Your Name" : "YN")}
+                <span class="font-no mono-label">{String.fromCharCode(65 + i)}</span>
+                <span
+                  class="font-sample"
+                  style:font-family={`"${f.family}"`}
+                  style:font-weight={f.weight}
+                  style:font-size="{(kind === 'signature' ? 30 : 34) * f.scale}px"
+                  style:color
+                >
+                  {typed.trim() || (kind === "signature" ? "Your Name" : "YN")}
+                </span>
               </button>
             {/each}
           </div>
@@ -344,23 +357,26 @@
               <img src={uploadPreview} alt="Uploaded {noun}" />
             {:else}
               <ImageUp size={26} strokeWidth={1.6} />
-              <span class="drop-title">Choose an image</span>
-              <span class="drop-sub">A photo or scan of your {noun} on white paper works best</span>
+              <span class="drop-title display">Choose a photo or scan</span>
+              <span class="drop-sub">Dark ink on white paper works best</span>
             {/if}
           </button>
           <input bind:this={fileInput} type="file" accept="image/*" hidden onchange={(e) => onFile(e.currentTarget.files?.[0])} />
           {#if uploaded}
             <label class="check">
-              <input type="checkbox" bind:checked={removeBg} /> Remove white background
+              <input type="checkbox" bind:checked={removeBg} /> Remove the white paper behind it
             </label>
           {/if}
         </div>
       {/if}
 
       {#if mode !== "upload"}
-        <div class="colors">
+        <div class="inks" role="radiogroup" aria-label="Ink colour">
           {#each COLORS as c (c.value)}
-            <button class="swatch" class:on={color === c.value} style:--c={c.value} aria-label={c.label} title={c.label} onclick={() => (color = c.value)}></button>
+            <button class="ink" class:on={color === c.value} style:--c={c.value} role="radio" aria-checked={color === c.value} onclick={() => (color = c.value)}>
+              <span class="pot"></span>
+              <span class="ink-name mono-label">{c.label}</span>
+            </button>
           {/each}
         </div>
       {/if}
@@ -368,12 +384,12 @@
 
     <footer>
       <label class="check">
-        <input type="checkbox" bind:checked={remember} /> Save for next time
+        <input type="checkbox" bind:checked={remember} /> Keep on file for next time
       </label>
       <div class="actions">
         <button class="btn" onclick={cancel}>Cancel</button>
         <button class="btn primary" disabled={!canSubmit} onclick={submit}>
-          {editor.signTarget ? "Sign" : `Use ${noun}`}
+          {editor.signTarget ? "Sign it" : `Use ${noun}`}
         </button>
       </div>
     </footer>
@@ -388,79 +404,94 @@
     display: grid;
     place-items: center;
     padding: 24px;
-    background: rgba(10, 12, 18, 0.45);
-    backdrop-filter: blur(4px);
+    background: rgba(28, 20, 8, 0.45);
+    backdrop-filter: blur(3px) sepia(0.3);
     animation: fade-in 0.15s;
   }
   .dialog {
     width: min(620px, 100%);
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 18px;
+    background: var(--surface) var(--grain);
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
     box-shadow: var(--shadow-lg);
-    animation: pop-in 0.18s ease-out;
+    animation: dialog-in 0.22s cubic-bezier(0.3, 1.2, 0.5, 1);
     overflow: hidden;
+  }
+  @keyframes dialog-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px) rotate(-1deg);
+    }
   }
   header {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    padding: 20px 20px 0 24px;
+    padding: 22px 20px 0 26px;
   }
   h2 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 650;
+    margin: 4px 0 0;
+    font-size: 26px;
+    font-weight: 480;
+    font-style: italic;
+    font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 72;
+    letter-spacing: -0.02em;
   }
   header p {
-    margin: 2px 0 0;
+    margin: 4px 0 0;
     color: var(--text-3);
     font-size: 13px;
   }
 
+  /* Index-card tabs that sit on top of the card below. */
   .tabs {
     display: flex;
     gap: 4px;
-    margin: 16px 24px 0;
-    padding: 4px;
-    border-radius: 11px;
-    background: var(--surface-2);
-    border: 1px solid var(--border);
+    margin: 18px 26px 0;
+    position: relative;
+    z-index: 1;
   }
   .tabs button {
-    flex: 1;
     display: inline-flex;
     align-items: center;
-    justify-content: center;
     gap: 7px;
-    height: 32px;
-    border: none;
-    border-radius: 8px;
-    background: transparent;
-    color: var(--text-2);
-    font-weight: 500;
+    height: 34px;
+    padding: 0 16px;
+    margin-bottom: -1px;
+    border: 1px solid var(--border-strong);
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+    background: var(--surface-3);
+    color: var(--text-3);
+    font-weight: 600;
+    transition: color 0.12s, background 0.12s;
   }
   .tabs button:hover {
     color: var(--text);
   }
   .tabs button.on {
-    background: var(--surface);
+    background: var(--surface-2);
     color: var(--text);
-    box-shadow: var(--shadow-sm), 0 0 0 1px var(--border);
+    height: 38px;
+    margin-top: -4px;
   }
-
-  .body {
-    padding: 16px 24px 4px;
+  .card {
+    margin: 0 26px;
+    padding: 16px;
+    background: var(--surface-2);
+    border: 1px solid var(--border-strong);
+    border-radius: 0 6px 6px 6px;
   }
   .pane.hidden {
     display: none;
   }
+
   .pad {
     position: relative;
     height: 210px;
-    border-radius: 12px;
-    background: #fff;
-    border: 1px solid var(--border);
+    border-radius: 2px;
+    background: #fffdf7;
+    box-shadow: 0 1px 2px rgba(60, 40, 10, 0.18);
     overflow: hidden;
   }
   .pad.initials {
@@ -478,25 +509,33 @@
   }
   .baseline {
     position: absolute;
-    left: 28px;
-    right: 28px;
-    bottom: 54px;
-    border-bottom: 1.5px dashed #cfd3dc;
+    left: 30px;
+    right: 30px;
+    bottom: 52px;
+    border-bottom: 1.5px solid #3a3326;
   }
-  .baseline span {
+  .baseline .x {
     position: absolute;
-    left: -2px;
-    bottom: 2px;
-    color: #b6bbc6;
-    font-size: 14px;
+    left: -4px;
+    bottom: 3px;
+    font-family: var(--font-display);
+    font-size: 20px;
+    color: #b8321f;
+  }
+  .line-label {
+    position: absolute;
+    top: 6px;
+    left: 0;
+    color: #a2977f;
   }
   .placeholder {
     position: absolute;
-    inset: 0 0 40px;
+    inset: 0 0 46px;
     display: grid;
     place-items: center;
-    color: #a3a9b6;
-    font-size: 15px;
+    font-family: var(--font-hand);
+    font-size: 26px;
+    color: #c2b7a0;
     pointer-events: none;
   }
   .clear {
@@ -507,58 +546,72 @@
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    height: 28px;
+    height: 26px;
     padding: 0 10px;
-    border: 1px solid #e3e5ea;
-    border-radius: 7px;
-    background: #fff;
-    color: #4c5361;
-    font-size: 12.5px;
-    font-weight: 500;
+    border: 1px solid #ddd3be;
+    border-radius: 3px;
+    background: #fbf8f1;
+    color: #5e574b;
+    font-family: var(--font-mono);
+    font-size: 11px;
   }
   .clear:hover {
-    background: #f6f7f9;
+    background: #f4efe3;
   }
 
   .name-input {
     width: 100%;
-    height: 42px;
-    padding: 0 14px;
-    border: 1px solid var(--border-strong);
-    border-radius: 10px;
-    background: var(--surface);
-    font-size: 15px;
+    height: 44px;
+    padding: 0 2px;
+    border: none;
+    border-bottom: 1.5px solid var(--text-2);
+    border-radius: 0;
+    background: transparent;
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-variation-settings: "SOFT" 100;
     outline: none;
-    transition: border-color 0.12s, box-shadow 0.12s;
   }
   .name-input:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-soft);
+    border-bottom-color: var(--accent);
   }
   .fonts {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
-    margin-top: 12px;
+    margin-top: 14px;
   }
   .font-card {
-    height: 76px;
-    padding: 0 14px;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    background: #fff;
+    position: relative;
+    display: grid;
+    place-items: center;
+    height: 78px;
+    padding: 0 16px;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    background: #fffdf7;
+    box-shadow: 0 1px 2px rgba(60, 40, 10, 0.15);
+    overflow: hidden;
+    transition: box-shadow 0.12s, transform 0.12s;
+  }
+  .font-card:hover {
+    transform: translateY(-1px) rotate(-0.5deg);
+  }
+  .font-card.on {
+    box-shadow: 0 0 0 2px var(--accent), 0 4px 10px -4px rgba(60, 40, 10, 0.4);
+  }
+  .font-no {
+    position: absolute;
+    top: 5px;
+    left: 7px;
+    color: #a2977f;
+  }
+  .font-sample {
+    max-width: 100%;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
     line-height: 1.6;
-    transition: border-color 0.12s, box-shadow 0.12s;
-  }
-  .font-card:hover {
-    border-color: var(--border-strong);
-  }
-  .font-card.on {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-soft);
   }
 
   .drop {
@@ -571,18 +624,16 @@
     height: 210px;
     padding: 16px;
     border: 1.5px dashed var(--border-strong);
-    border-radius: 12px;
-    background: var(--surface-2);
-    color: var(--text-3);
-    transition: border-color 0.12s, background 0.12s;
+    border-radius: 2px;
+    background: #fffdf7;
+    color: #958b79;
+    transition: border-color 0.12s;
   }
   .drop:hover {
     border-color: var(--accent);
-    background: var(--accent-soft);
   }
   .drop.has {
-    background: #fff
-      repeating-conic-gradient(#f1f2f5 0% 25%, transparent 0% 50%) 50% / 16px 16px;
+    background: #fff repeating-conic-gradient(#f1ece0 0% 25%, transparent 0% 50%) 50% / 16px 16px;
   }
   .drop img {
     max-width: 100%;
@@ -591,38 +642,46 @@
   }
   .drop-title {
     margin-top: 4px;
-    color: var(--text);
-    font-weight: 600;
+    color: #221f1a;
+    font-size: 18px;
+    font-variation-settings: "SOFT" 100, "WONK" 1;
   }
   .drop-sub {
     font-size: 12.5px;
   }
 
-  .colors {
+  /* Ink pots */
+  .inks {
     display: flex;
     justify-content: center;
-    gap: 6px;
+    gap: 18px;
     margin-top: 14px;
   }
-  .swatch {
-    display: grid;
-    place-items: center;
-    width: 30px;
-    height: 30px;
+  .ink {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
     padding: 0;
     border: none;
-    border-radius: 50%;
-    background: transparent;
+    background: none;
   }
-  .swatch::before {
-    content: "";
-    width: 18px;
-    height: 18px;
+  .pot {
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
-    background: var(--c);
+    background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--c) 40%, white) 0 12%, var(--c) 45%);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    transition: transform 0.12s;
   }
-  .swatch.on::before {
-    box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--c);
+  .ink:hover .pot {
+    transform: scale(1.1);
+  }
+  .ink.on .pot {
+    box-shadow: 0 0 0 2px var(--surface-2), 0 0 0 4px var(--c);
+  }
+  .ink.on .ink-name {
+    color: var(--text);
   }
 
   footer {
@@ -630,10 +689,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    margin-top: 16px;
-    padding: 14px 20px 14px 24px;
-    background: var(--surface-2);
-    border-top: 1px solid var(--border);
+    padding: 16px 20px 18px 26px;
   }
   .actions {
     display: flex;

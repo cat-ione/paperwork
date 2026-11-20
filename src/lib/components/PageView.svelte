@@ -233,7 +233,7 @@
     flex: none;
     background: #fff;
     box-shadow: var(--shadow-page);
-    border-radius: 2px;
+    border-radius: 1px;
   }
   .canvas,
   .layer,
@@ -265,7 +265,7 @@
     display: flex;
     align-items: center;
     padding-left: 2px;
-    border-left: 2px solid #5b5bd6;
+    border-left: 2px solid #23408e;
     color: #111;
     font-family: Arimo, Arial, sans-serif;
     white-space: nowrap;
@@ -273,7 +273,7 @@
   .draft {
     position: absolute;
     background: #fff;
-    outline: 1.5px dashed #5b5bd6;
+    outline: 1.5px dashed #b8321f;
     box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.7);
   }
   .draft.hl {

@@ -83,10 +83,10 @@
     align-items: center;
     gap: 2px;
     padding: 4px;
-    border-radius: 10px;
-    background: #1c1d22;
-    color: #e8e9ec;
-    box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.06);
+    border-radius: 7px;
+    background: #24211c;
+    color: #efe7d6;
+    box-shadow: 0 10px 24px -8px rgba(30, 20, 5, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.05);
     white-space: nowrap;
     cursor: default;
     z-index: 10;
@@ -127,7 +127,7 @@
     height: 24px;
     padding: 0 8px;
     border-radius: 5px;
-    color: #a9acb6;
+    color: #a89d88;
     font-size: 13px;
   }
   .seg button:hover {
@@ -138,10 +138,11 @@
     color: #fff;
   }
   .size {
-    min-width: 22px;
+    min-width: 24px;
     text-align: center;
+    font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
-    font-weight: 600;
+    font-weight: 500;
   }
   .swatch {
     width: 24px;
@@ -160,7 +161,7 @@
     box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25);
   }
   .swatch.on::before {
-    box-shadow: 0 0 0 2px #1c1d22, 0 0 0 3.5px #fff;
+    box-shadow: 0 0 0 2px #24211c, 0 0 0 3.5px #efe7d6;
   }
   .sep {
     width: 1px;

@@ -181,6 +181,7 @@
       i: "initials",
       d: "date",
       x: "check",
+      c: "cross",
       w: "whiteout",
       h: "highlight",
     };
@@ -214,9 +215,9 @@
 {#if dragging}
   <div class="drop-overlay">
     <div class="drop-card">
-      <FileUp size={36} strokeWidth={1.6} />
-      <div class="drop-title">Drop to open</div>
-      <div class="drop-sub">Release to open the PDF</div>
+      <FileUp size={34} strokeWidth={1.5} />
+      <div class="drop-title">Let go to file it</div>
+      <div class="drop-sub mono-label">PDF documents only</div>
     </div>
   </div>
 {/if}
@@ -248,8 +249,8 @@
     z-index: 100;
     display: grid;
     place-items: center;
-    background: color-mix(in srgb, var(--accent) 12%, transparent);
-    backdrop-filter: blur(3px);
+    background: color-mix(in srgb, var(--desk) 70%, transparent);
+    backdrop-filter: blur(2px);
     animation: fade-in 0.12s;
     pointer-events: none;
   }
@@ -257,21 +258,30 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
-    padding: 36px 56px;
-    border-radius: 20px;
-    border: 2px dashed var(--accent);
-    background: var(--surface);
-    color: var(--accent-text);
-    box-shadow: var(--shadow-lg);
+    gap: 4px;
+    padding: 34px 60px 30px;
+    background: var(--grain), linear-gradient(175deg, var(--manila), var(--manila-dark));
+    color: var(--manila-ink);
+    border-radius: 4px 4px 12px 12px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), inset 0 -2px 0 var(--manila-edge), var(--shadow-lg);
+    transform: rotate(-1.5deg);
+    animation: drop-card-in 0.25s cubic-bezier(0.3, 1.4, 0.5, 1);
+  }
+  @keyframes drop-card-in {
+    from {
+      transform: rotate(-4deg) scale(0.9);
+    }
   }
   .drop-title {
-    margin-top: 6px;
-    font-size: 17px;
-    font-weight: 600;
-    color: var(--text);
+    margin-top: 8px;
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-style: italic;
+    font-weight: 500;
+    font-variation-settings: "SOFT" 100, "WONK" 1;
   }
   .drop-sub {
-    color: var(--text-3);
+    color: inherit;
+    opacity: 0.65;
   }
 </style>

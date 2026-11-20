@@ -185,19 +185,21 @@
   .item::after {
     content: "";
     position: absolute;
-    inset: -2px;
-    border-radius: 3px;
+    inset: -3px;
+    border: 1px dashed transparent;
+    border-radius: 2px;
     pointer-events: none;
-    transition: box-shadow 0.1s;
+    transition: border-color 0.1s, background 0.1s;
   }
   .item:hover::after {
-    box-shadow: 0 0 0 1px rgba(91, 91, 214, 0.5);
+    border-color: rgba(35, 64, 142, 0.55);
   }
   .item.selected::after {
-    box-shadow: 0 0 0 1.5px #5b5bd6;
+    border: 1.5px dashed #23408e;
   }
   .item.editing::after {
-    box-shadow: 0 0 0 1.5px #5b5bd6, 0 0 0 4px rgba(91, 91, 214, 0.2);
+    border: 1.5px solid #23408e;
+    background: rgba(243, 212, 74, 0.12);
   }
   .item.selected {
     z-index: 3;
@@ -220,7 +222,8 @@
     cursor: text;
   }
   .text-input::placeholder {
-    color: rgba(17, 17, 17, 0.35);
+    color: rgba(35, 64, 142, 0.45);
+    font-style: italic;
   }
   .grip {
     position: absolute;
@@ -230,9 +233,9 @@
     display: grid;
     place-items: center;
     width: 14px;
-    border-radius: 4px;
-    background: #5b5bd6;
-    color: #fff;
+    border-radius: 3px;
+    background: #23408e;
+    color: #fbf8f1;
   }
 
   img,
@@ -257,13 +260,16 @@
 
   .handle {
     position: absolute;
-    width: 10px;
-    height: 10px;
-    border-radius: 3px;
-    background: #fff;
-    border: 1.5px solid #5b5bd6;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #fbf8f1;
+    border: 2px solid #23408e;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
     z-index: 1;
+  }
+  .handle:hover {
+    background: #23408e;
   }
   .nw {
     left: -7px;

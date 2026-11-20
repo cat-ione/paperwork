@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ArrowRight, CalendarDays, Check, Circle, CircleCheck, Eraser, MousePointerClick, PenLine, Type } from "@lucide/svelte";
+  import { ArrowRight, CalendarDays, Check, Eraser, PenLine, Type, X } from "@lucide/svelte";
   import { editor, isFilled } from "../editor.svelte";
   import type { FieldWidget } from "../types";
 
@@ -25,7 +25,6 @@
   });
 
   const total = $derived(editor.progressFields.length);
-  const pct = $derived(total ? editor.filledCount / total : 0);
   const done = $derived(total > 0 && editor.filledCount === total);
 
   const signedNames = $derived(
@@ -43,15 +42,15 @@
 
   function preview(w: FieldWidget): string {
     const v = editor.values[w.name];
-    if (w.kind === "checkbox") return v ? "Checked" : "";
-    if (w.kind === "signature") return signedNames.has(w.name) ? "Signed" : "";
+    if (w.kind === "checkbox") return v ? "✓" : "";
+    if (w.kind === "signature") return signedNames.has(w.name) ? "signed" : "";
     if (w.kind === "radio" || w.kind === "select") {
       const all = editor.widgets.filter((x) => x.name === w.name);
       const opt = all.flatMap((x) => x.options).find((o) => o.value === v);
       return opt?.label ?? String(v ?? "");
     }
     if (Array.isArray(v)) return v.join(", ");
-    return w.password && v ? "••••••" : String(v ?? "");
+    return w.password && v ? "••••••" : String(v ?? "").replace(/\s*\n\s*/g, " / ");
   }
 
   function filled(w: FieldWidget) {
@@ -59,79 +58,97 @@
     return isFilled(editor.values[w.name]);
   }
 
-  const R = 22;
-  const C = 2 * Math.PI * R;
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const today = new Date().toLocaleDateString(undefined, { day: "2-digit", month: "short", year: "numeric" });
 </script>
 
-<aside class="panel" aria-label="Form">
-  {#if fields.length}
-    <div class="summary">
-      <div class="ring" class:done>
-        <svg viewBox="0 0 56 56" width="56" height="56">
-          <circle cx="28" cy="28" r={R} class="track" />
-          <circle cx="28" cy="28" r={R} class="bar" stroke-dasharray={C} stroke-dashoffset={C * (1 - pct)} />
-        </svg>
-        <span class="ring-label">
-          {#if done}<Check size={20} strokeWidth={3} />{:else}{Math.round(pct * 100)}%{/if}
-        </span>
-      </div>
-      <div class="summary-text">
-        <div class="title">{done ? "All filled in" : "Fill out form"}</div>
-        <div class="sub">
-          {editor.filledCount} of {total} fields completed
-          {#if editor.missingRequired.length}
-            · <span class="req">{editor.missingRequired.length} required</span>
-          {/if}
-        </div>
-      </div>
-    </div>
-    {#if !done}
-      <button class="btn next" onclick={() => editor.nextEmptyField()}>
-        Next empty field <ArrowRight size={15} />
-      </button>
-    {/if}
+<aside class="panel" aria-label="Checklist">
+  <header class="panel-head">
+    <h2 class="display">Checklist</h2>
+    <span class="mono-label">{fields.length ? "Form" : "No form"}</span>
+  </header>
 
-    <div class="list">
+  {#if fields.length}
+    <div class="tally">
+      <div class="count">
+        <span class="big display">{pad(editor.filledCount)}</span>
+        <span class="of">/ {pad(total)} filled</span>
+      </div>
+
+      {#if total <= 36}
+        <div class="gauge" aria-hidden="true">
+          {#each Array(total) as _, i (i)}
+            <span class="seg" class:on={i < editor.filledCount}></span>
+          {/each}
+        </div>
+      {:else}
+        <div class="gauge bar" aria-hidden="true">
+          <span class="fill" style:width="{(editor.filledCount / total) * 100}%"></span>
+        </div>
+      {/if}
+
+      {#if done}
+        <div class="complete" role="status">
+          <span class="complete-word">Complete</span>
+          <span class="complete-date">{today}</span>
+        </div>
+      {:else}
+        {#if editor.missingRequired.length}
+          <p class="req">✱ {editor.missingRequired.length} required {editor.missingRequired.length === 1 ? "blank remains" : "blanks remain"}</p>
+        {/if}
+        <button class="btn primary next" onclick={() => editor.nextEmptyField()}>
+          Next blank <ArrowRight size={15} />
+        </button>
+      {/if}
+    </div>
+
+    <div class="ledger">
       {#each byPage as [page, list] (page)}
-        <div class="group-head">Page {page + 1}</div>
+        <div class="group-head mono-label"><span>Page {pad(page + 1)}</span></div>
         {#each list as w (w.id)}
           {@const ok = filled(w)}
-          <button class="row" onclick={() => editor.focusField(w)}>
-            <span class="status" class:ok class:required={w.required && !ok}>
-              {#if ok}<CircleCheck size={16} />{:else if w.kind === "signature"}<PenLine size={15} />{:else}<Circle size={16} />{/if}
-            </span>
-            <span class="row-text">
-              <span class="label">
-                {w.label}{#if w.required}<span class="asterisk">*</span>{/if}
-              </span>
-              {#if preview(w)}
-                <span class="value">{preview(w)}</span>
+          {@const value = preview(w)}
+          <button class="row" class:ok onclick={() => editor.focusField(w)}>
+            <span class="box" class:required={w.required && !ok} class:sig={w.kind === "signature"}>
+              {#if ok}
+                <svg viewBox="0 0 24 24" class="tick" aria-hidden="true">
+                  <path d="M3 13.5c2.5 1.6 4.2 3.6 5.6 6.2C11.5 12 15.8 6.6 22 2.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              {:else if w.kind === "signature"}
+                <PenLine size={11} strokeWidth={2.4} />
               {/if}
             </span>
+            <span class="label">
+              {w.label}{#if w.required}<span class="asterisk">✱</span>{/if}
+            </span>
+            {#if value}
+              <span class="value">{value}</span>
+            {/if}
           </button>
         {/each}
       {/each}
     </div>
 
-    <div class="footer">
+    <footer class="panel-foot">
       <label class="switch">
         <input type="checkbox" bind:checked={editor.highlightFields} />
-        <span class="track-sw"><span class="thumb-sw"></span></span>
-        Highlight fields
+        <span class="track"><span class="knob"></span></span>
+        Show blanks
       </label>
-      <button class="btn ghost danger small" onclick={() => editor.clearFields()}>Clear form</button>
-    </div>
+      <button class="btn ghost danger small" onclick={() => editor.clearFields()}>
+        <Eraser size={14} /> Erase all
+      </button>
+    </footer>
   {:else}
     <div class="empty">
-      <div class="empty-icon"><MousePointerClick size={22} /></div>
-      <div class="title">No fillable fields</div>
-      <p>This PDF has no form fields, but you can still fill it in with the tools above:</p>
+      <p class="empty-lede display">Nothing to fill in&nbsp;— so write on it directly.</p>
       <ul>
-        <li><span class="ti"><Type size={15} /></span><span><b>Text</b> — click anywhere and type</span></li>
-        <li><span class="ti"><PenLine size={15} /></span><span><b>Sign</b> — draw, type or upload a signature</span></li>
-        <li><span class="ti"><CalendarDays size={15} /></span><span><b>Date</b> — stamp today's date</span></li>
-        <li><span class="ti"><Check size={15} /></span><span><b>Check</b> — tick boxes on the page</span></li>
-        <li><span class="ti"><Eraser size={15} /></span><span><b>Whiteout</b> — cover up mistakes</span></li>
+        <li><span class="kbd">T</span><Type size={15} /><span><b>Text</b> anywhere you click</span></li>
+        <li><span class="kbd">S</span><PenLine size={15} /><span><b>Sign</b>: draw, type or upload</span></li>
+        <li><span class="kbd">D</span><CalendarDays size={15} /><span><b>Date</b>: today, stamped</span></li>
+        <li><span class="kbd">X</span><Check size={15} /><span><b>Tick</b> the boxes</span></li>
+        <li><span class="kbd">C</span><X size={15} /><span><b>Cross</b> things out</span></li>
+        <li><span class="kbd">W</span><Eraser size={15} /><span><b>Whiteout</b> mistakes</span></li>
       </ul>
     </div>
   {/if}
@@ -140,146 +157,223 @@
 <style>
   .panel {
     flex: none;
-    width: 292px;
+    width: 300px;
     display: flex;
     flex-direction: column;
-    background: var(--surface);
-    border-left: 1px solid var(--border);
+    background: var(--surface) var(--grain);
+    border-left: 1px solid var(--border-strong);
     min-height: 0;
   }
-  .summary {
+  .panel-head {
     display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 18px 18px 14px;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 18px 20px 0;
   }
-  .ring {
+  h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 560;
+    font-style: italic;
+    font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 48;
+  }
+
+  .tally {
     position: relative;
-    flex: none;
-    width: 56px;
-    height: 56px;
+    padding: 10px 20px 16px;
+    border-bottom: 1px solid var(--border-strong);
+    box-shadow: 0 3px 0 -2px var(--border);
   }
-  .ring svg {
-    transform: rotate(-90deg);
+  .count {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
   }
-  .ring circle {
-    fill: none;
-    stroke-width: 5;
+  .big {
+    font-size: 46px;
+    font-weight: 400;
+    line-height: 1;
+    font-variation-settings: "SOFT" 0, "WONK" 0, "opsz" 144;
+    font-variant-numeric: lining-nums tabular-nums;
   }
-  .track {
-    stroke: var(--surface-3);
-  }
-  .bar {
-    stroke: var(--accent);
-    stroke-linecap: round;
-    transition: stroke-dashoffset 0.35s ease, stroke 0.2s;
-  }
-  .ring.done .bar {
-    stroke: var(--success);
-  }
-  .ring-label {
-    position: absolute;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    font-size: 13px;
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-  }
-  .ring.done .ring-label {
-    color: var(--success);
-  }
-  .title {
-    font-size: 15px;
-    font-weight: 650;
-  }
-  .sub {
+  .of {
+    font-family: var(--font-mono);
+    font-size: 12px;
     color: var(--text-3);
-    font-size: 12.5px;
+  }
+  .gauge {
+    display: flex;
+    gap: 3px;
+    height: 10px;
+    margin: 12px 0 14px;
+  }
+  .seg {
+    flex: 1;
+    border-radius: 1px;
+    background: var(--surface-3);
+    box-shadow: inset 0 0 0 1px var(--border);
+    transition: background 0.25s;
+  }
+  .seg.on {
+    background: var(--accent);
+    box-shadow: none;
+  }
+  .gauge.bar {
+    position: relative;
+    border-radius: 1px;
+    background:
+      repeating-linear-gradient(90deg, transparent 0 calc(10% - 1px), var(--border-strong) calc(10% - 1px) 10%),
+      var(--surface-3);
+    overflow: hidden;
+  }
+  .fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    background: var(--accent);
+    transition: width 0.3s;
   }
   .req {
-    color: var(--danger);
-    font-weight: 500;
+    margin: 0 0 10px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--stamp);
   }
   .next {
-    margin: 0 18px 12px;
+    width: 100%;
     justify-content: space-between;
   }
 
-  .list {
+  .complete {
+    --rot: -7deg;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: max-content;
+    margin: 2px auto 2px;
+    padding: 6px 18px 5px;
+    border: 3px double var(--stamp);
+    border-radius: 6px;
+    color: var(--stamp);
+    transform: rotate(var(--rot));
+    mask-image: var(--stamp-mask);
+    animation: stamp-in 0.4s cubic-bezier(0.3, 1.4, 0.5, 1);
+  }
+  .complete-word {
+    font-family: var(--font-mono);
+    font-size: 21px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    line-height: 1.2;
+  }
+  .complete-date {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  /* Ledger paper: ruled rows with a red margin line. */
+  .ledger {
+    --rule: color-mix(in srgb, var(--accent) 16%, var(--border));
+    --margin: 40px;
+    position: relative;
     flex: 1;
     overflow-y: auto;
-    padding: 4px 10px 12px;
-    border-top: 1px solid var(--border);
+    padding-bottom: 16px;
+    background: linear-gradient(90deg, transparent calc(var(--margin) - 1px), color-mix(in srgb, var(--stamp) 35%, transparent) calc(var(--margin) - 1px) calc(var(--margin) + 1px), transparent calc(var(--margin) + 1px)) local;
   }
   .group-head {
     position: sticky;
     top: 0;
-    padding: 12px 8px 6px;
-    background: var(--surface);
-    color: var(--text-3);
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
     z-index: 1;
+    display: flex;
+    align-items: center;
+    height: 34px;
+    padding-left: calc(var(--margin) + 12px);
+    background: var(--surface);
+    border-bottom: 1px solid var(--rule);
   }
   .row {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 10px;
     width: 100%;
-    padding: 7px 8px;
+    min-height: 38px;
+    padding: 4px 16px 4px 14px;
     border: none;
-    border-radius: var(--radius-sm);
+    border-bottom: 1px solid var(--rule);
     background: transparent;
     text-align: left;
   }
   .row:hover {
-    background: var(--surface-2);
+    background: color-mix(in srgb, var(--marker) 22%, transparent);
   }
-  .status {
+  .box {
+    position: relative;
     flex: none;
     display: grid;
     place-items: center;
-    margin-top: 1px;
+    width: 15px;
+    height: 15px;
+    margin-right: 13px;
+    border: 1.5px solid var(--text-2);
+    border-radius: 2px;
     color: var(--text-3);
   }
-  .status.ok {
-    color: var(--success);
+  .box.required {
+    border-color: var(--stamp);
   }
-  .status.required {
-    color: var(--danger);
+  .box.sig {
+    border-style: dashed;
   }
-  .row-text {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
+  .tick {
+    position: absolute;
+    left: -2px;
+    bottom: 0;
+    width: 22px;
+    height: 22px;
+    color: var(--accent);
   }
   .label {
+    flex: 1;
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     font-size: 13px;
+    color: var(--text);
+  }
+  .row.ok .label {
+    color: var(--text-2);
   }
   .asterisk {
-    margin-left: 2px;
-    color: var(--danger);
+    margin-left: 3px;
+    font-size: 10px;
+    color: var(--stamp);
+    vertical-align: 2px;
   }
   .value {
+    flex: none;
+    max-width: 48%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    color: var(--text-3);
-    font-size: 12px;
+    font-family: var(--font-hand);
+    font-size: 19px;
+    font-weight: 500;
+    line-height: 1;
+    color: var(--accent-text);
+    transform: rotate(-1deg);
   }
 
-  .footer {
+  .panel-foot {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 10px 14px 10px 18px;
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--border-strong);
+    background: var(--surface-2);
   }
   .small {
     height: 30px;
@@ -291,6 +385,7 @@
     align-items: center;
     gap: 9px;
     font-size: 13px;
+    font-weight: 500;
     color: var(--text-2);
     cursor: pointer;
   }
@@ -299,79 +394,66 @@
     opacity: 0;
     pointer-events: none;
   }
-  .track-sw {
+  .track {
     position: relative;
-    width: 32px;
+    width: 34px;
     height: 18px;
-    border-radius: 99px;
-    background: var(--border-strong);
+    border-radius: 3px;
+    background: var(--surface-3);
+    box-shadow: var(--inset);
     transition: background 0.15s;
   }
-  .thumb-sw {
+  .knob {
     position: absolute;
     top: 2px;
     left: 2px;
     width: 14px;
     height: 14px;
-    border-radius: 50%;
-    background: #fff;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+    border-radius: 2px;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-bottom-width: 2px;
     transition: translate 0.15s;
   }
-  .switch input:checked + .track-sw {
+  .switch input:checked + .track {
     background: var(--accent);
   }
-  .switch input:checked + .track-sw .thumb-sw {
-    translate: 14px 0;
+  .switch input:checked + .track .knob {
+    translate: 16px 0;
   }
-  .switch input:focus-visible + .track-sw {
+  .switch input:focus-visible + .track {
     outline: 2px solid var(--accent);
     outline-offset: 2px;
   }
 
   .empty {
-    padding: 28px 22px;
+    padding: 16px 20px 24px;
+  }
+  .empty-lede {
+    margin: 4px 0 18px;
+    font-size: 18px;
+    line-height: 1.3;
+    font-variation-settings: "SOFT" 100, "WONK" 1;
     color: var(--text-2);
-  }
-  .empty-icon {
-    display: grid;
-    place-items: center;
-    width: 44px;
-    height: 44px;
-    margin-bottom: 14px;
-    border-radius: 12px;
-    background: var(--accent-soft);
-    color: var(--accent-text);
-  }
-  .empty p {
-    margin: 6px 0 16px;
-    font-size: 13px;
-    color: var(--text-3);
   }
   .empty ul {
     list-style: none;
     margin: 0;
     padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    font-size: 13px;
+    border-top: 1px solid var(--border);
   }
   .empty li {
     display: flex;
     align-items: center;
     gap: 10px;
-  }
-  .ti {
-    display: grid;
-    place-items: center;
-    flex: none;
-    width: 28px;
-    height: 28px;
-    border-radius: 8px;
-    background: var(--surface-2);
-    border: 1px solid var(--border);
+    padding: 10px 2px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
     color: var(--text-2);
+  }
+  .empty li :global(svg) {
+    flex: none;
+    color: var(--text-3);
   }
   .empty b {
     color: var(--text);
@@ -380,7 +462,7 @@
 
   @media (max-width: 1100px) {
     .panel {
-      width: 250px;
+      width: 260px;
     }
   }
 </style>

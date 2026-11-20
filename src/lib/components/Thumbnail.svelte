@@ -40,6 +40,6 @@
   canvas {
     display: block;
     background: #fff;
-    border-radius: 3px;
+    border-radius: 1px;
   }
 </style>

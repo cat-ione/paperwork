@@ -1,5 +1,11 @@
 import { mount } from "svelte";
-import "@fontsource-variable/inter";
+// Interface type: Fraunces (display, with its SOFT/WONK axes), Instrument Sans (UI), IBM Plex Mono (labels).
+import "@fontsource-variable/fraunces/full.css";
+import "@fontsource-variable/fraunces/full-italic.css";
+import "@fontsource-variable/instrument-sans/standard.css";
+import "@fontsource/ibm-plex-mono/400.css";
+import "@fontsource/ibm-plex-mono/500.css";
+import "@fontsource/ibm-plex-mono/600.css";
 // Metric-compatible stand-ins for Helvetica / Times / Courier, so placed text matches the export.
 import "@fontsource/arimo/400.css";
 import "@fontsource/tinos/400.css";

@@ -23,7 +23,6 @@
     Type,
     Undo2,
     X,
-    XCircle,
   } from "@lucide/svelte";
   import type { Component } from "svelte";
   import { editor } from "../editor.svelte";
@@ -44,7 +43,7 @@
     { id: "initials", label: "Initials", key: "I", icon: SquarePen },
     { id: "date", label: "Date", key: "D", icon: CalendarDays },
     { id: "check", label: "Check", key: "X", icon: Check },
-    { id: "cross", label: "Cross", key: "", icon: X },
+    { id: "cross", label: "Cross", key: "C", icon: X },
     { id: "whiteout", label: "Whiteout", key: "W", icon: Eraser },
     { id: "highlight", label: "Highlight", key: "H", icon: Highlighter },
   ];
@@ -76,31 +75,38 @@
 
 <header class="toolbar">
   <div class="left">
-    <div class="brand"><Logo size={26} /></div>
-    <button class="icon-btn" data-tip="Open… (Ctrl+O)" onclick={onOpen}><FolderOpen size={18} /></button>
-    <div class="file" title={editor.filePath ?? editor.fileName}>
-      <span class="name">{editor.fileName}</span>
-      {#if editor.dirty}<span class="dirty" title="Unsaved changes"></span>{/if}
+    <div class="brand">
+      <Logo size={30} />
+      <span class="wordmark display">Paperwork</span>
     </div>
-    <button class="icon-btn close" data-tip="Close (Ctrl+W)" onclick={onClose}><XCircle size={16} /></button>
+    <span class="vrule"></span>
+    <button class="icon-btn" data-tip="Open… Ctrl+O" aria-label="Open a PDF" onclick={onOpen}><FolderOpen size={18} /></button>
+    <div class="file-tab" title={editor.filePath ?? editor.fileName}>
+      <span class="name">{editor.fileName}</span>
+      <button class="tab-close" aria-label="Close document" title="Close (Ctrl+W)" onclick={onClose}>
+        <X size={13} strokeWidth={2.5} />
+      </button>
+    </div>
+    {#if editor.dirty}
+      <span class="unsaved" title="You have unsaved changes">Unsaved</span>
+    {/if}
   </div>
 
-  <div class="tools" role="toolbar" aria-label="Tools">
+  <div class="tray" role="toolbar" aria-label="Tools">
     {#each tools as t, i (t.id)}
-      {#if i === 1 || i === 5 || i === 7}<span class="sep"></span>{/if}
-      <div class="tool-wrap">
+      {#if i === 1 || i === 5 || i === 7}<span class="groove"></span>{/if}
+      <div class="key-wrap">
         <button
-          class="tool"
+          class="key"
           class:active={isActive(t.id)}
           aria-pressed={isActive(t.id)}
-          data-tip={t.key ? `${t.label} (${t.key})` : t.label}
+          aria-label={t.label}
+          data-tip={t.label}
           onclick={() => pick(t.id)}
           onpointerdown={(e) => e.stopPropagation()}
         >
-          <t.icon size={18} strokeWidth={t.id === "check" || t.id === "cross" ? 2.6 : 2} />
-          {#if t.id === "text" || t.id === "signature" || t.id === "date"}
-            <span class="tool-label">{t.label}</span>
-          {/if}
+          <span class="cap">{t.key}</span>
+          <t.icon size={18} strokeWidth={t.id === "check" || t.id === "cross" ? 2.6 : 1.9} />
         </button>
         {#if (t.id === "signature" || t.id === "initials") && editor.signaturePicker === t.id}
           <SignaturePicker kind={t.id} />
@@ -110,20 +116,21 @@
   </div>
 
   <div class="right">
-    <button class="icon-btn" data-tip="Undo (Ctrl+Z)" disabled={!editor.canUndo} onclick={() => editor.undo()}>
+    <button class="icon-btn" data-tip="Undo Ctrl+Z" aria-label="Undo" disabled={!editor.canUndo} onclick={() => editor.undo()}>
       <Undo2 size={18} />
     </button>
-    <button class="icon-btn" data-tip="Redo (Ctrl+Y)" disabled={!editor.canRedo} onclick={() => editor.redo()}>
+    <button class="icon-btn" data-tip="Redo Ctrl+Y" aria-label="Redo" disabled={!editor.canRedo} onclick={() => editor.redo()}>
       <Redo2 size={18} />
     </button>
-    <span class="sep"></span>
-    <button class="icon-btn" data-tip="Theme: {prefs.theme}" onclick={cycleTheme}>
+    <span class="vrule"></span>
+    <button class="icon-btn" data-tip="Theme: {prefs.theme}" aria-label="Change theme" onclick={cycleTheme}>
       {#if prefs.theme === "light"}<Sun size={18} />{:else if prefs.theme === "dark"}<Moon size={18} />{:else}<Monitor size={18} />{/if}
     </button>
     <button
       class="icon-btn"
       class:active={editor.showThumbnails}
-      data-tip="Pages panel"
+      data-tip="Pages"
+      aria-label="Toggle pages panel"
       onclick={() => (editor.showThumbnails = !editor.showThumbnails)}
     >
       <PanelLeft size={18} />
@@ -131,48 +138,45 @@
     <button
       class="icon-btn"
       class:active={editor.showFieldsPanel}
-      data-tip="Form panel"
+      data-tip="Checklist"
+      aria-label="Toggle checklist panel"
       onclick={() => (editor.showFieldsPanel = !editor.showFieldsPanel)}
     >
       <PanelRight size={18} />
     </button>
 
-    <div class="save" onpointerdown={(e) => e.stopPropagation()} role="group">
-      <button class="btn primary save-main" disabled={editor.saving} onclick={() => save("save")}>
+    <div class="stamp" onpointerdown={(e) => e.stopPropagation()} role="group" aria-label="Save">
+      <button class="stamp-main" disabled={editor.saving} onclick={() => save("save")}>
         {#if editor.saving}
-          <LoaderCircle size={16} class="spin" />
+          <LoaderCircle size={15} class="spin" />
         {:else if inTauri}
-          <Save size={16} />
+          <Save size={15} />
         {:else}
-          <Download size={16} />
+          <Download size={15} />
         {/if}
-        {inTauri ? "Save" : "Download"}
+        <span class="stamp-label">{inTauri ? "Save" : "Download"}</span>
       </button>
-      <button
-        class="btn primary save-more"
-        aria-label="More save options"
-        disabled={editor.saving}
-        onclick={() => (saveMenu = !saveMenu)}
-      >
-        <ChevronDown size={16} />
+      <button class="stamp-more" aria-label="More save options" disabled={editor.saving} onclick={() => (saveMenu = !saveMenu)}>
+        <ChevronDown size={15} strokeWidth={2.5} />
       </button>
       {#if saveMenu}
         <div class="popover save-menu">
+          <div class="menu-head mono-label">File it as…</div>
           <button class="menu-item" onclick={() => save("save")}>
-            <Save size={16} />
-            <span>Save<span class="sub">Keep form fields editable</span></span>
-            <span class="hint">Ctrl+S</span>
+            <Save size={17} />
+            <span>{inTauri ? "Save" : "Download"}<span class="sub">Form fields stay editable</span></span>
+            <span class="hint">Ctrl S</span>
           </button>
           {#if inTauri}
             <button class="menu-item" onclick={() => save("saveAs")}>
-              <FilePlus2 size={16} />
-              <span>Save as…<span class="sub">Save a copy under a new name</span></span>
-              <span class="hint">Ctrl+Shift+S</span>
+              <FilePlus2 size={17} />
+              <span>Save a copy…<span class="sub">Keep the original untouched</span></span>
+              <span class="hint">Ctrl ⇧ S</span>
             </button>
           {/if}
           <button class="menu-item" onclick={() => save("flatten")}>
-            <FileLock2 size={16} />
-            <span>Save flattened copy…<span class="sub">Lock everything in place — ready to send</span></span>
+            <FileLock2 size={17} />
+            <span>Flattened copy…<span class="sub">Everything locked in place, ready to send</span></span>
           </button>
         </div>
       {/if}
@@ -183,13 +187,14 @@
 <style>
   .toolbar {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) auto minmax(max-content, 1fr);
     align-items: center;
-    gap: 12px;
-    height: 56px;
-    padding: 0 12px;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
+    gap: 14px;
+    height: 62px;
+    padding: 0 14px;
+    background: var(--surface) var(--grain);
+    border-bottom: 1px solid var(--border-strong);
+    box-shadow: 0 3px 0 -2px var(--border);
     position: relative;
     z-index: 20;
   }
@@ -203,123 +208,254 @@
   .right {
     justify-content: flex-end;
   }
+
   .brand {
-    display: grid;
-    place-items: center;
-    margin-right: 6px;
-  }
-  .file {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 9px;
+    flex: none;
+  }
+  .wordmark {
+    font-size: 21px;
+    font-style: italic;
+    font-weight: 540;
+    font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 36;
+    letter-spacing: -0.02em;
+  }
+  .vrule {
+    flex: none;
+    width: 1px;
+    height: 26px;
+    margin: 0 8px;
+    background: var(--border-strong);
+    box-shadow: 1px 0 0 var(--surface);
+  }
+
+  /* The open document, shown as a manila folder tab. */
+  .file-tab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     min-width: 0;
-    padding: 0 4px 0 6px;
+    height: 32px;
+    margin-left: 2px;
+    padding: 0 26px 0 12px;
+    background: linear-gradient(var(--manila), var(--manila-dark));
+    color: var(--manila-ink);
+    clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 100%, 0 100%);
+    border-radius: 6px 0 0 0;
     font-weight: 600;
+    font-size: 13.5px;
+    max-width: 240px;
   }
   .name {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  .dirty {
+  .tab-close {
     flex: none;
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--warning);
-  }
-  .close {
-    opacity: 0;
-    transition: opacity 0.12s;
-  }
-  .left:hover .close,
-  .close:focus-visible {
-    opacity: 1;
-  }
-
-  .tools {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-    padding: 4px;
-    border-radius: 12px;
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-  }
-  .tool-wrap {
-    position: relative;
-  }
-  .tool {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    height: 34px;
-    min-width: 36px;
-    padding: 0 9px;
-    justify-content: center;
-    border: none;
-    border-radius: 8px;
-    background: transparent;
-    color: var(--text-2);
-    font-weight: 500;
-    transition: background 0.12s, color 0.12s, box-shadow 0.12s;
-  }
-  .tool:hover {
-    background: var(--surface-3);
-    color: var(--text);
-  }
-  .tool.active {
-    background: var(--surface);
-    color: var(--accent-text);
-    box-shadow: var(--shadow-sm), 0 0 0 1px var(--border);
-  }
-  .sep {
-    width: 1px;
+    display: grid;
+    place-items: center;
+    width: 20px;
     height: 20px;
-    margin: 0 4px;
-    background: var(--border);
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: inherit;
+    opacity: 0.55;
+  }
+  .tab-close:hover {
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.12);
   }
 
-  .save {
+  .unsaved {
+    --rot: -5deg;
+    flex: none;
+    margin-left: 8px;
+    padding: 2px 6px 1px;
+    border: 1.5px solid var(--stamp);
+    border-radius: 3px;
+    color: var(--stamp);
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    transform: rotate(var(--rot));
+    mask-image: var(--stamp-mask);
+    animation: stamp-in 0.3s cubic-bezier(0.3, 1.4, 0.5, 1);
+  }
+
+  /* Tools: typewriter keys sitting in a recessed pen tray. */
+  .tray {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 7px 7px;
+    border-radius: 13px;
+    background: var(--surface-3);
+    box-shadow: var(--inset);
+  }
+  .key-wrap {
+    position: relative;
+  }
+  .key {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 38px;
+    padding: 0;
+    border: 1px solid var(--border-strong);
+    border-bottom-width: 3px;
+    border-radius: 8px;
+    background: linear-gradient(var(--surface), var(--surface-2));
+    color: var(--text-2);
+    transition: transform 0.07s, color 0.12s, border-color 0.12s;
+  }
+  .key:hover {
+    color: var(--text);
+    transform: translateY(-1px);
+  }
+  .key:active,
+  .key.active {
+    transform: translateY(2px);
+    border-bottom-width: 1px;
+  }
+  .key.active {
+    background: var(--accent-soft);
+    border-color: color-mix(in srgb, var(--accent) 45%, var(--border-strong));
+    color: var(--accent-text);
+  }
+  .cap {
+    position: absolute;
+    top: 1px;
+    left: 4px;
+    font-family: var(--font-mono);
+    font-size: 8.5px;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--text-3);
+  }
+  .key.active .cap {
+    color: var(--accent-text);
+    opacity: 0.7;
+  }
+  .groove {
+    width: 2px;
+    height: 24px;
+    margin: 0 3px;
+    border-radius: 1px;
+    background: var(--border-strong);
+    box-shadow: 1px 0 0 var(--surface);
+  }
+
+  /* Save: a rubber stamp. */
+  .stamp {
     position: relative;
     display: flex;
-    margin-left: 8px;
+    align-items: stretch;
+    height: 38px;
+    margin-left: 10px;
+    border: 2px solid var(--stamp);
+    border-radius: 5px;
+    background: var(--surface);
+    box-shadow: inset 0 0 0 2px var(--surface), inset 0 0 0 3px color-mix(in srgb, var(--stamp) 55%, transparent);
+    color: var(--stamp);
+    transform: rotate(-1.5deg);
+    transition: transform 0.15s;
   }
-  .save-main {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    padding-right: 12px;
+  .stamp:hover {
+    transform: rotate(0deg);
   }
-  .save-more {
-    width: 30px;
-    padding: 0;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    border-left: 1px solid rgba(255, 255, 255, 0.22);
+  .stamp-main,
+  .stamp-more {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    border: none;
+    background: transparent;
+    color: inherit;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    mask-image: var(--stamp-mask);
+    transition: background 0.12s, transform 0.08s;
+  }
+  .stamp-main {
+    padding: 0 12px 0 13px;
+    border-radius: 3px 0 0 3px;
+  }
+  .stamp-more {
+    padding: 0 9px;
+    border-left: 1.5px dashed color-mix(in srgb, var(--stamp) 60%, transparent);
+    border-radius: 0 3px 3px 0;
+  }
+  .stamp-main:hover:not(:disabled),
+  .stamp-more:hover:not(:disabled) {
+    background: var(--stamp-soft);
+  }
+  .stamp-main:active:not(:disabled) {
+    transform: scale(0.94);
+  }
+  .stamp button:disabled {
+    cursor: progress;
   }
   .save-menu {
-    top: calc(100% + 6px);
-    right: 0;
-    width: 330px;
+    top: calc(100% + 8px);
+    right: -2px;
+    width: 320px;
+    color: var(--text);
+  }
+  .menu-head {
+    padding: 6px 10px 4px;
   }
 
-  :global(.spin) {
-    animation: spin 0.8s linear infinite;
-  }
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
-    }
-  }
-
-  @media (max-width: 1180px) {
-    .tool-label {
+  @media (max-width: 1360px) {
+    .wordmark {
       display: none;
     }
   }
-  @media (max-width: 940px) {
-    .file {
+  @media (max-width: 1080px) {
+    .file-tab,
+    .unsaved,
+    .vrule {
       display: none;
+    }
+  }
+  /* Compact: smaller keys and an icon-only stamp so everything fits down to the 760px minimum. */
+  @media (max-width: 980px) {
+    .toolbar {
+      gap: 8px;
+      padding: 0 10px;
+    }
+    .tray {
+      gap: 3px;
+      padding: 5px;
+    }
+    .key {
+      width: 32px;
+      height: 34px;
+    }
+    .cap {
+      display: none;
+    }
+    .groove {
+      margin: 0 2px;
+    }
+    .stamp-label {
+      display: none;
+    }
+    .stamp {
+      margin-left: 4px;
+    }
+    .stamp-main {
+      padding: 0 10px;
     }
   }
 </style>

@@ -15,7 +15,7 @@
     }}
   >
     <div class="icon"><LockKeyhole size={22} /></div>
-    <h2 id="pw-title">Password required</h2>
+    <h2 id="pw-title">Sealed document</h2>
     <p>{prompt.retry ? "That password didn't work. Try again." : "This PDF is protected. Enter its password to open it."}</p>
     <!-- svelte-ignore a11y_autofocus -->
     <input type="password" bind:value={password} placeholder="Password" autofocus class:error={prompt.retry} />
@@ -33,57 +33,66 @@
     z-index: 90;
     display: grid;
     place-items: center;
-    background: rgba(10, 12, 18, 0.45);
-    backdrop-filter: blur(4px);
+    background: rgba(28, 20, 8, 0.45);
+    backdrop-filter: blur(3px) sepia(0.3);
     animation: fade-in 0.15s;
   }
   .dialog {
-    width: min(380px, calc(100% - 32px));
-    padding: 24px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 18px;
+    width: min(390px, calc(100% - 32px));
+    padding: 26px 26px 22px;
+    background: var(--surface) var(--grain);
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
     box-shadow: var(--shadow-lg);
     animation: pop-in 0.18s ease-out;
   }
+  /* A wax seal. */
   .icon {
     display: grid;
     place-items: center;
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    background: var(--accent-soft);
-    color: var(--accent-text);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--stamp) 70%, white), var(--stamp) 55%);
+    box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--stamp) 80%, black), 0 2px 4px rgba(60, 20, 10, 0.35);
+    color: #fbf8f1;
   }
   h2 {
-    margin: 14px 0 4px;
-    font-size: 17px;
+    margin: 16px 0 4px;
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 500;
+    font-style: italic;
+    font-variation-settings: "SOFT" 100, "WONK" 1;
   }
   p {
-    margin: 0 0 16px;
-    color: var(--text-3);
+    margin: 0 0 18px;
+    color: var(--text-2);
     font-size: 13px;
   }
   input {
     width: 100%;
-    height: 40px;
-    padding: 0 12px;
-    border: 1px solid var(--border-strong);
-    border-radius: 10px;
-    background: var(--surface);
+    height: 42px;
+    padding: 0 2px;
+    border: none;
+    border-bottom: 1.5px solid var(--text-2);
+    border-radius: 0;
+    background: transparent;
+    font-family: var(--font-mono);
+    font-size: 15px;
+    letter-spacing: 0.1em;
     outline: none;
   }
   input:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-soft);
+    border-bottom-color: var(--accent);
   }
   input.error {
-    border-color: var(--danger);
+    border-bottom-color: var(--stamp);
   }
   .actions {
     display: flex;
     justify-content: flex-end;
     gap: 8px;
-    margin-top: 18px;
+    margin-top: 22px;
   }
 </style>

@@ -39,7 +39,7 @@ The release workflow builds installers for Windows, macOS (Apple Silicon and Int
 | Key | Action |
 | --- | --- |
 | Ctrl+O / Ctrl+S / Ctrl+Shift+S | Open / Save / Save as |
-| V T S I D X W H | Select, Text, Sign, Initials, Date, Check, Whiteout, Highlight |
+| V T S I D X C W H | Select, Text, Sign, Initials, Date, Check, Cross, Whiteout, Highlight |
 | Del, Arrows (Shift = 10pt), Ctrl+D | Delete, nudge, duplicate the selected item |
 | Ctrl+Z / Ctrl+Y | Undo / Redo |
 | Ctrl+= / Ctrl+- / Ctrl+0 | Zoom in / out / fit width |

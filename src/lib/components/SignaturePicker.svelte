@@ -13,7 +13,7 @@
 
 <div class="popover picker" onpointerdown={(e) => e.stopPropagation()} role="dialog" tabindex="-1" aria-label="Choose {noun}">
   <div class="head">
-    {#if editor.signTarget}Sign “{editor.signTarget.label}”{:else}Choose a {noun}{/if}
+    {#if editor.signTarget}Signing “{editor.signTarget.label}”{:else}{noun === "signature" ? "Signatures" : "Initials"} on file{/if}
   </div>
   <div class="list">
     {#each saved as sig (sig.id)}
@@ -38,24 +38,26 @@
       editor.signatureDialog = kind;
     }}
   >
-    <Plus size={16} /> Create new {noun}
+    <Plus size={16} /> New {noun}
   </button>
 </div>
 
 <style>
   .picker {
-    top: calc(100% + 10px);
+    top: calc(100% + 12px);
     left: 50%;
     translate: -50% 0;
     width: 300px;
+    padding: 8px;
   }
   .head {
-    padding: 6px 8px 8px;
-    color: var(--text-3);
-    font-size: 12px;
-    font-weight: 600;
+    padding: 4px 6px 10px;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    color: var(--text-3);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -63,27 +65,40 @@
   .list {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
   }
   .sig-row {
     position: relative;
   }
+  /* Each saved signature is a little specimen card, signed on the line. */
   .sig {
+    position: relative;
     display: grid;
     place-items: center;
     width: 100%;
-    height: 76px;
-    padding: 10px 16px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    background: #fff;
-    transition: border-color 0.12s, box-shadow 0.12s;
+    height: 78px;
+    padding: 10px 20px 16px;
+    border: none;
+    border-radius: 2px;
+    background: #fffdf7;
+    box-shadow: 0 1px 2px rgba(60, 40, 10, 0.2);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .sig::after {
+    content: "";
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: 14px;
+    border-bottom: 1px solid #c7baa0;
   }
   .sig:hover {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-soft);
+    transform: translateY(-1px) rotate(-0.6deg);
+    box-shadow: 0 0 0 2px var(--accent), 0 6px 14px -6px rgba(60, 40, 10, 0.45);
   }
   .sig img {
+    position: relative;
+    z-index: 1;
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
@@ -92,22 +107,27 @@
     position: absolute;
     top: 4px;
     right: 4px;
-    width: 28px;
-    height: 28px;
+    z-index: 2;
+    width: 26px;
+    height: 26px;
     opacity: 0;
-    color: #6b7280;
+    color: #958b79;
   }
   .del:hover {
-    background: #fee2e2 !important;
-    color: #dc2626 !important;
+    background: #f5e0d8 !important;
+    color: #b8321f !important;
   }
   .sig-row:hover .del,
   .del:focus-visible {
     opacity: 1;
   }
   .add {
-    margin-top: 6px;
+    margin-top: 8px;
+    border: 1px dashed var(--border-strong);
+    justify-content: center;
     color: var(--accent-text);
-    font-weight: 500;
+  }
+  .add:hover {
+    border-color: var(--accent);
   }
 </style>
