@@ -1,6 +1,6 @@
 [package]
 name = "paperwork"
-version = "0.3.0"
+version = "0.3.1"
 description = "Fill out and sign PDF forms and contracts"
 edition = "2021"
 
