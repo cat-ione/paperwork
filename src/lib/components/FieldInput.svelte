@@ -160,7 +160,6 @@
 {/if}
 
 <style>
-  /* Fields look like the blanks on a paper form: a faint ink wash and a pen-stroke underline. */
   .field {
     position: absolute;
     margin: 0;
@@ -174,33 +173,33 @@
     transition: background 0.12s, box-shadow 0.12s;
   }
   :global(.highlight) > .field {
-    background-color: rgba(35, 64, 142, 0.06);
-    box-shadow: inset 0 -1.5px 0 rgba(35, 64, 142, 0.5);
+    background-color: color-mix(in srgb, var(--accent) 13%, transparent);
+    box-shadow: inset 0 -1.5px 0 color-mix(in srgb, var(--accent) 50%, transparent);
   }
   :global(.highlight) > .field.toggle {
-    box-shadow: inset 0 0 0 1.25px rgba(35, 64, 142, 0.5);
+    box-shadow: inset 0 0 0 1.25px color-mix(in srgb, var(--accent) 50%, transparent);
   }
-  /* Required and still blank: a notary-red corner flag. */
+  /* Required and empty: red corner flag. */
   :global(.highlight) > .field.required.empty,
   :global(.highlight) > .field.toggle.required {
-    background-image: linear-gradient(135deg, #b8321f 0 5px, transparent 5px);
-    box-shadow: inset 0 -1.5px 0 rgba(184, 50, 31, 0.65);
-    background-color: rgba(184, 50, 31, 0.05);
+    background-image: linear-gradient(135deg, var(--danger) 0 5px, transparent 5px);
+    box-shadow: inset 0 -1.5px 0 color-mix(in srgb, var(--danger) 65%, transparent);
+    background-color: color-mix(in srgb, var(--danger) 5%, transparent);
   }
   :global(.highlight) > .field.toggle.required {
-    box-shadow: inset 0 0 0 1.25px rgba(184, 50, 31, 0.65);
+    box-shadow: inset 0 0 0 1.25px color-mix(in srgb, var(--danger) 65%, transparent);
   }
   .field:hover:not(:disabled) {
-    background-color: rgba(35, 64, 142, 0.12);
+    background-color: color-mix(in srgb, var(--accent) 22%, transparent);
   }
   .field:focus,
   .field:focus-visible {
-    background-color: #fffdf6 !important;
+    background-color: #fff !important;
     background-image: none !important;
     box-shadow:
-      inset 0 -2px 0 #23408e,
-      0 0 0 1px rgba(35, 64, 142, 0.35),
-      0 0 0 4px rgba(243, 212, 74, 0.45) !important;
+      inset 0 -2px 0 var(--accent),
+      0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent),
+      0 0 0 4px color-mix(in srgb, var(--accent) 27%, transparent) !important;
     outline: none;
     z-index: 2;
   }
@@ -242,32 +241,29 @@
     padding: 0 2px;
   }
 
-  /* Signature fields: a red "sign here" flag like the sticky tabs on a contract. */
+  /* Signature fields */
   .sign {
     display: flex;
     align-items: center;
     justify-content: flex-start;
     gap: 0.4em;
     padding: 0 0.5em;
-    background: rgba(184, 50, 31, 0.07) !important;
+    background: color-mix(in srgb, var(--danger) 7%, transparent) !important;
     background-image: none !important;
-    box-shadow: inset 0 -1.5px 0 rgba(184, 50, 31, 0.7) !important;
-    color: #b8321f;
+    box-shadow: inset 0 -1.5px 0 color-mix(in srgb, var(--danger) 70%, transparent) !important;
+    color: var(--danger);
     overflow: hidden;
     white-space: nowrap;
   }
   .sign:hover {
-    background: rgba(184, 50, 31, 0.14) !important;
+    background: color-mix(in srgb, var(--danger) 14%, transparent) !important;
   }
   .sign .x {
-    font-family: var(--font-display);
-    font-weight: 600;
+    font-weight: 700;
   }
   .sign .sign-text {
     flex: 1;
-    font-family: var(--font-display);
-    font-style: italic;
-    font-weight: 500;
-    font-variation-settings: "SOFT" 100, "WONK" 1;
+    font-family: var(--font-ui);
+    font-weight: 600;
   }
 </style>

@@ -63,8 +63,6 @@
     if (n >= 1 && n <= editor.pages.length) editor.goToPage(n - 1);
   }
 
-  const pad = (n: number) => String(n).padStart(2, "0");
-
   const cursor = $derived(
     editor.tool === "select" ? "default" : editor.tool === "whiteout" || editor.tool === "highlight" ? "crosshair" : "copy",
   );
@@ -72,20 +70,21 @@
   const hint = $derived.by(() => {
     switch (editor.tool) {
       case "text":
-        return "Click where you want to write";
+        return "Click to add text";
       case "date":
-        return "Click to stamp today's date";
+        return "Click to add today's date";
       case "check":
+        return "Click to add a check";
       case "cross":
-        return "Click a box to mark it";
+        return "Click to add a cross";
       case "signature":
-        return "Click where you'd like to sign";
+        return "Click to place signature";
       case "initials":
-        return "Click to add your initials";
+        return "Click to place initials";
       case "whiteout":
-        return "Drag over anything to cover it up";
+        return "Drag to cover";
       case "highlight":
-        return "Drag across the text to highlight";
+        return "Drag to highlight";
       default:
         return "";
     }
@@ -112,16 +111,10 @@
   </div>
 
   {#if editor.tool !== "select"}
-    {#key editor.tool}
-      <div class="sticky-note" role="status">
-        <span class="note-text">{hint}</span>
-        <span class="note-esc"><span class="kbd">Esc</span> to put it back</span>
-      </div>
-    {/key}
+    <div class="hint" role="status">{hint} <span class="kbd">Esc</span></div>
   {/if}
 
   <div class="zoombar">
-    <span class="mono-label folio">Folio</span>
     <button class="icon-btn" aria-label="Previous page" disabled={editor.currentPage === 0} onclick={() => editor.goToPage(editor.currentPage - 1)}>
       <ChevronLeft size={16} />
     </button>
@@ -149,10 +142,10 @@
             editingPage = true;
           }}
         >
-          {pad(editor.currentPage + 1)}
+          {editor.currentPage + 1}
         </button>
       {/if}
-      <span class="of">of {pad(editor.pages.length)}</span>
+      <span class="of">/ {editor.pages.length}</span>
     </div>
     <button
       class="icon-btn"
@@ -182,37 +175,29 @@
   .scroller {
     flex: 1;
     overflow: auto;
-    background:
-      radial-gradient(ellipse at 50% 0%, transparent 60%, rgba(60, 40, 10, 0.08) 100%),
-      var(--grain),
-      var(--desk);
-    background-attachment: local, local, local;
+    background: var(--desk);
   }
   .pages {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 28px;
-    padding: 32px 40px 110px;
+    gap: 20px;
+    padding: 24px 32px 96px;
     width: max-content;
     min-width: 100%;
   }
 
-  /* Status strip: a strip of ruler along the bottom edge. */
   .zoombar {
     position: absolute;
     left: 50%;
-    bottom: 18px;
+    bottom: 16px;
     translate: -50% 0;
     display: flex;
     align-items: center;
     gap: 1px;
-    padding: 9px 6px 5px 12px;
-    border-radius: 4px;
-    background:
-      repeating-linear-gradient(90deg, var(--border-strong) 0 1px, transparent 1px 8px) top left / 100% 4px no-repeat,
-      repeating-linear-gradient(90deg, var(--text-3) 0 1px, transparent 1px 40px) top left / 100% 7px no-repeat,
-      var(--surface);
+    padding: 4px;
+    border-radius: var(--radius-lg);
+    background: var(--surface-2);
     border: 1px solid var(--border-strong);
     box-shadow: var(--shadow-md);
     z-index: 10;
@@ -221,118 +206,74 @@
     width: 28px;
     height: 28px;
   }
-  .folio {
-    margin-right: 2px;
-  }
   .divider {
     width: 1px;
     height: 18px;
-    margin: 0 6px;
+    margin: 0 4px;
     background: var(--border-strong);
   }
   .page-ind {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: 5px;
     padding: 0 2px;
     font-family: var(--font-mono);
+    font-size: 12px;
     font-variant-numeric: tabular-nums;
   }
   .page-btn,
   .page-input {
-    width: 34px;
-    height: 26px;
+    width: 36px;
+    height: 24px;
     padding: 0;
-    border: none;
-    border-bottom: 1.5px solid var(--text-3);
-    border-radius: 0;
-    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    background: var(--surface-3);
     text-align: center;
-    font-family: var(--font-display);
-    font-size: 17px;
+    font-family: var(--font-mono);
+    font-size: 12px;
     font-weight: 600;
-    font-variation-settings: "SOFT" 100, "WONK" 1;
-  }
-  .page-btn:hover {
-    border-bottom-color: var(--accent);
-    color: var(--accent-text);
   }
   .page-input {
-    border-bottom-color: var(--accent);
+    border-color: var(--accent);
+    background: var(--surface);
     outline: none;
   }
   .of {
     color: var(--text-3);
-    font-size: 11.5px;
     white-space: nowrap;
   }
   .zoom-val {
-    min-width: 50px;
+    min-width: 48px;
     height: 28px;
     border: none;
     border-radius: 4px;
     background: transparent;
     font-family: var(--font-mono);
     font-size: 12px;
-    font-weight: 500;
     font-variant-numeric: tabular-nums;
   }
   .zoom-val:hover {
     background: var(--surface-3);
   }
 
-  /* Tool hint: a sticky note slapped onto the desk. */
-  .sticky-note {
+  .hint {
     position: absolute;
-    right: 28px;
-    bottom: 26px;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    max-width: 230px;
-    padding: 16px 18px 12px;
-    background: linear-gradient(170deg, color-mix(in srgb, var(--note) 85%, white), var(--note));
-    color: #3a3110;
-    box-shadow: 0 1px 1px rgba(60, 45, 10, 0.15), 0 12px 18px -10px rgba(60, 45, 10, 0.5);
-    transform: rotate(-2deg);
-    pointer-events: none;
-    z-index: 10;
-    animation: note-in 0.25s cubic-bezier(0.3, 1.3, 0.5, 1);
-  }
-  .sticky-note::before {
-    content: "";
-    position: absolute;
-    top: -9px;
+    top: 12px;
     left: 50%;
-    width: 70px;
-    height: 20px;
     translate: -50% 0;
-    rotate: -3deg;
-    background: rgba(255, 255, 255, 0.45);
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04);
-  }
-  .note-text {
-    font-family: var(--font-hand);
-    font-size: 23px;
-    font-weight: 500;
-    line-height: 1.05;
-  }
-  .note-esc {
-    margin-top: 6px;
-    font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: 0.04em;
-    opacity: 0.7;
-  }
-  .note-esc .kbd {
-    background: rgba(255, 255, 255, 0.5);
-    border-color: rgba(58, 49, 16, 0.3);
-    color: inherit;
-  }
-  @keyframes note-in {
-    from {
-      opacity: 0;
-      transform: translateY(-10px) rotate(-3deg) scale(0.96);
-    }
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 6px 5px 12px;
+    border-radius: var(--radius);
+    background: var(--surface-2);
+    border: 1px solid var(--border-strong);
+    box-shadow: var(--shadow-md);
+    font-size: 13px;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 10;
+    animation: pop-in 0.1s ease-out;
   }
 </style>

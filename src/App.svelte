@@ -4,6 +4,7 @@
   import { editor } from "./lib/editor.svelte";
   import { prefs } from "./lib/storage.svelte";
   import { toasts } from "./lib/toast.svelte";
+  import { applyTheme, getTheme } from "./lib/themes";
   import {
     confirmDialog,
     fromBrowserFile,
@@ -24,12 +25,7 @@
 
   let dragging = $state(false);
 
-  // Theme
-  $effect(() => {
-    const root = document.documentElement;
-    if (prefs.theme === "system") delete root.dataset.theme;
-    else root.dataset.theme = prefs.theme;
-  });
+  $effect(() => applyTheme(getTheme(prefs.theme)));
 
   // Window title
   $effect(() => {
@@ -215,9 +211,8 @@
 {#if dragging}
   <div class="drop-overlay">
     <div class="drop-card">
-      <FileUp size={34} strokeWidth={1.5} />
-      <div class="drop-title">Let go to file it</div>
-      <div class="drop-sub mono-label">PDF documents only</div>
+      <FileUp size={28} strokeWidth={1.6} />
+      <div class="drop-title">Drop to open</div>
     </div>
   </div>
 {/if}
@@ -249,39 +244,23 @@
     z-index: 100;
     display: grid;
     place-items: center;
-    background: color-mix(in srgb, var(--desk) 70%, transparent);
-    backdrop-filter: blur(2px);
-    animation: fade-in 0.12s;
+    background: color-mix(in srgb, var(--desk) 75%, transparent);
+    animation: fade-in 0.1s;
     pointer-events: none;
   }
   .drop-card {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 4px;
-    padding: 34px 60px 30px;
-    background: var(--grain), linear-gradient(175deg, var(--manila), var(--manila-dark));
-    color: var(--manila-ink);
-    border-radius: 4px 4px 12px 12px;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), inset 0 -2px 0 var(--manila-edge), var(--shadow-lg);
-    transform: rotate(-1.5deg);
-    animation: drop-card-in 0.25s cubic-bezier(0.3, 1.4, 0.5, 1);
-  }
-  @keyframes drop-card-in {
-    from {
-      transform: rotate(-4deg) scale(0.9);
-    }
+    gap: 12px;
+    padding: 22px 32px;
+    border: 2px dashed var(--accent);
+    border-radius: var(--radius-lg);
+    background: var(--surface-2);
+    color: var(--accent);
   }
   .drop-title {
-    margin-top: 8px;
-    font-family: var(--font-display);
-    font-size: 26px;
-    font-style: italic;
-    font-weight: 500;
-    font-variation-settings: "SOFT" 100, "WONK" 1;
-  }
-  .drop-sub {
-    color: inherit;
-    opacity: 0.65;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text);
   }
 </style>

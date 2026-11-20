@@ -13,9 +13,9 @@
   let remember = $state(true);
 
   const COLORS = [
-    { value: "#111111", label: "Carbon" },
-    { value: "#1d3fae", label: "Royal" },
-    { value: "#5b21b6", label: "Violet" },
+    { value: "#111111", label: "Black" },
+    { value: "#1d3fae", label: "Blue" },
+    { value: "#5b21b6", label: "Purple" },
   ];
   const FONTS = [
     { family: "Dancing Script", weight: 500, scale: 1 },
@@ -275,9 +275,8 @@
   <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="sig-title">
     <header>
       <div>
-        <span class="mono-label">Specimen {noun}</span>
-        <h2 id="sig-title" class="display">{kind === "signature" ? "Your signature, please." : "Your initials, please."}</h2>
-        <p>{editor.signTarget ? `It goes on “${editor.signTarget.label}”.` : "Afterwards, click on the document to place it."}</p>
+        <h2 id="sig-title">{kind === "signature" ? "Signature" : "Initials"}</h2>
+        {#if editor.signTarget}<p>{editor.signTarget.label}</p>{/if}
       </div>
       <button class="icon-btn" aria-label="Close" onclick={cancel}><X size={18} /></button>
     </header>
@@ -298,12 +297,12 @@
       <div class="pane" class:hidden={mode !== "draw"}>
         <div class="pad" class:initials={kind === "initials"}>
           <canvas bind:this={canvas} onpointerdown={onDrawDown}></canvas>
-          <div class="baseline"><span class="x">✕</span><span class="line-label mono-label">Signature of party</span></div>
+          <div class="baseline"><span class="x">✕</span></div>
           {#if !hasInk}
-            <div class="placeholder">sign above the line</div>
+            <div class="placeholder">Draw here</div>
           {/if}
           {#if hasInk}
-            <button class="clear" onclick={clearDrawing}><RotateCcw size={13} /> Start over</button>
+            <button class="clear" onclick={clearDrawing}><RotateCcw size={13} /> Clear</button>
           {/if}
         </div>
       </div>
@@ -319,7 +318,7 @@
             onkeydown={(e) => e.key === "Enter" && canSubmit && submit()}
           />
           <div class="fonts" role="radiogroup" aria-label="Handwriting style">
-            {#each FONTS as f, i (f.family)}
+            {#each FONTS as f (f.family)}
               <button
                 class="font-card"
                 class:on={font === f.family}
@@ -327,7 +326,6 @@
                 aria-checked={font === f.family}
                 onclick={() => (font = f.family)}
               >
-                <span class="font-no mono-label">{String.fromCharCode(65 + i)}</span>
                 <span
                   class="font-sample"
                   style:font-family={`"${f.family}"`}
@@ -357,14 +355,14 @@
               <img src={uploadPreview} alt="Uploaded {noun}" />
             {:else}
               <ImageUp size={26} strokeWidth={1.6} />
-              <span class="drop-title display">Choose a photo or scan</span>
+              <span class="drop-title">Choose an image</span>
               <span class="drop-sub">Dark ink on white paper works best</span>
             {/if}
           </button>
           <input bind:this={fileInput} type="file" accept="image/*" hidden onchange={(e) => onFile(e.currentTarget.files?.[0])} />
           {#if uploaded}
             <label class="check">
-              <input type="checkbox" bind:checked={removeBg} /> Remove the white paper behind it
+              <input type="checkbox" bind:checked={removeBg} /> Remove white background
             </label>
           {/if}
         </div>
@@ -373,10 +371,7 @@
       {#if mode !== "upload"}
         <div class="inks" role="radiogroup" aria-label="Ink colour">
           {#each COLORS as c (c.value)}
-            <button class="ink" class:on={color === c.value} style:--c={c.value} role="radio" aria-checked={color === c.value} onclick={() => (color = c.value)}>
-              <span class="pot"></span>
-              <span class="ink-name mono-label">{c.label}</span>
-            </button>
+            <button class="ink" class:on={color === c.value} style:--c={c.value} role="radio" aria-checked={color === c.value} aria-label={c.label} title={c.label} onclick={() => (color = c.value)}></button>
           {/each}
         </div>
       {/if}
@@ -384,12 +379,12 @@
 
     <footer>
       <label class="check">
-        <input type="checkbox" bind:checked={remember} /> Keep on file for next time
+        <input type="checkbox" bind:checked={remember} /> Save for next time
       </label>
       <div class="actions">
         <button class="btn" onclick={cancel}>Cancel</button>
         <button class="btn primary" disabled={!canSubmit} onclick={submit}>
-          {editor.signTarget ? "Sign it" : `Use ${noun}`}
+          {editor.signTarget ? "Sign" : "Use"}
         </button>
       </div>
     </footer>
@@ -404,83 +399,66 @@
     display: grid;
     place-items: center;
     padding: 24px;
-    background: rgba(28, 20, 8, 0.45);
-    backdrop-filter: blur(3px) sepia(0.3);
-    animation: fade-in 0.15s;
+    background: rgba(0, 0, 0, 0.5);
+    animation: fade-in 0.1s;
   }
   .dialog {
-    width: min(620px, 100%);
-    background: var(--surface) var(--grain);
+    width: min(600px, 100%);
+    background: var(--surface);
     border: 1px solid var(--border-strong);
-    border-radius: 4px;
+    border-radius: var(--radius-lg);
     box-shadow: var(--shadow-lg);
-    animation: dialog-in 0.22s cubic-bezier(0.3, 1.2, 0.5, 1);
+    animation: pop-in 0.12s ease-out;
     overflow: hidden;
-  }
-  @keyframes dialog-in {
-    from {
-      opacity: 0;
-      transform: translateY(12px) rotate(-1deg);
-    }
   }
   header {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    padding: 22px 20px 0 26px;
+    padding: 14px 12px 0 18px;
   }
   h2 {
     margin: 4px 0 0;
-    font-size: 26px;
-    font-weight: 480;
-    font-style: italic;
-    font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 72;
-    letter-spacing: -0.02em;
+    font-size: 16px;
+    font-weight: 650;
   }
   header p {
-    margin: 4px 0 0;
+    margin: 2px 0 0;
     color: var(--text-3);
     font-size: 13px;
   }
 
-  /* Index-card tabs that sit on top of the card below. */
   .tabs {
     display: flex;
-    gap: 4px;
-    margin: 18px 26px 0;
-    position: relative;
-    z-index: 1;
+    gap: 2px;
+    margin: 12px 18px 0;
+    padding: 3px;
+    border-radius: var(--radius);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    width: max-content;
   }
   .tabs button {
     display: inline-flex;
     align-items: center;
-    gap: 7px;
-    height: 34px;
-    padding: 0 16px;
-    margin-bottom: -1px;
-    border: 1px solid var(--border-strong);
-    border-bottom: none;
-    border-radius: 6px 6px 0 0;
-    background: var(--surface-3);
+    gap: 6px;
+    height: 28px;
+    padding: 0 12px;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
     color: var(--text-3);
-    font-weight: 600;
-    transition: color 0.12s, background 0.12s;
+    font-weight: 560;
   }
   .tabs button:hover {
     color: var(--text);
   }
   .tabs button.on {
-    background: var(--surface-2);
+    background: var(--surface-3);
     color: var(--text);
-    height: 38px;
-    margin-top: -4px;
   }
   .card {
-    margin: 0 26px;
-    padding: 16px;
-    background: var(--surface-2);
-    border: 1px solid var(--border-strong);
-    border-radius: 0 6px 6px 6px;
+    padding: 12px 18px 0;
   }
   .pane.hidden {
     display: none;
@@ -488,14 +466,13 @@
 
   .pad {
     position: relative;
-    height: 210px;
-    border-radius: 2px;
-    background: #fffdf7;
-    box-shadow: 0 1px 2px rgba(60, 40, 10, 0.18);
+    height: 200px;
+    border-radius: var(--radius);
+    background: #fff;
     overflow: hidden;
   }
   .pad.initials {
-    width: 340px;
+    width: 320px;
     margin: 0 auto;
   }
   .pad canvas {
@@ -509,102 +486,81 @@
   }
   .baseline {
     position: absolute;
-    left: 30px;
-    right: 30px;
-    bottom: 52px;
-    border-bottom: 1.5px solid #3a3326;
+    left: 28px;
+    right: 28px;
+    bottom: 48px;
+    border-bottom: 1.5px solid #c9ccd6;
   }
   .baseline .x {
     position: absolute;
-    left: -4px;
+    left: -2px;
     bottom: 3px;
-    font-family: var(--font-display);
-    font-size: 20px;
-    color: #b8321f;
-  }
-  .line-label {
-    position: absolute;
-    top: 6px;
-    left: 0;
-    color: #a2977f;
+    font-size: 15px;
+    color: #9ca0b0;
   }
   .placeholder {
     position: absolute;
-    inset: 0 0 46px;
+    inset: 0 0 40px;
     display: grid;
     place-items: center;
-    font-family: var(--font-hand);
-    font-size: 26px;
-    color: #c2b7a0;
+    font-size: 14px;
+    color: #9ca0b0;
     pointer-events: none;
   }
   .clear {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 8px;
+    right: 8px;
     z-index: 2;
     display: inline-flex;
     align-items: center;
     gap: 5px;
     height: 26px;
-    padding: 0 10px;
-    border: 1px solid #ddd3be;
-    border-radius: 3px;
-    background: #fbf8f1;
-    color: #5e574b;
-    font-family: var(--font-mono);
-    font-size: 11px;
+    padding: 0 9px;
+    border: 1px solid #dcdfe6;
+    border-radius: 4px;
+    background: #fff;
+    color: #4c4f69;
+    font-size: 12px;
   }
   .clear:hover {
-    background: #f4efe3;
+    background: #f2f3f7;
   }
 
   .name-input {
     width: 100%;
-    height: 44px;
-    padding: 0 2px;
-    border: none;
-    border-bottom: 1.5px solid var(--text-2);
-    border-radius: 0;
-    background: transparent;
-    font-family: var(--font-display);
-    font-size: 20px;
-    font-variation-settings: "SOFT" 100;
+    height: 38px;
+    padding: 0 10px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    background: var(--surface-2);
+    font-size: 15px;
     outline: none;
   }
   .name-input:focus {
-    border-bottom-color: var(--accent);
+    border-color: var(--accent);
   }
   .fonts {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-top: 14px;
+    gap: 8px;
+    margin-top: 10px;
   }
   .font-card {
-    position: relative;
     display: grid;
     place-items: center;
-    height: 78px;
-    padding: 0 16px;
-    border: 1px solid transparent;
-    border-radius: 2px;
-    background: #fffdf7;
-    box-shadow: 0 1px 2px rgba(60, 40, 10, 0.15);
+    height: 72px;
+    padding: 0 14px;
+    border: 2px solid transparent;
+    border-radius: var(--radius);
+    background: #fff;
     overflow: hidden;
-    transition: box-shadow 0.12s, transform 0.12s;
   }
   .font-card:hover {
-    transform: translateY(-1px) rotate(-0.5deg);
+    border-color: var(--border-strong);
   }
   .font-card.on {
-    box-shadow: 0 0 0 2px var(--accent), 0 4px 10px -4px rgba(60, 40, 10, 0.4);
-  }
-  .font-no {
-    position: absolute;
-    top: 5px;
-    left: 7px;
-    color: #a2977f;
+    border-color: var(--accent);
   }
   .font-sample {
     max-width: 100%;
@@ -621,19 +577,18 @@
     justify-content: center;
     gap: 6px;
     width: 100%;
-    height: 210px;
+    height: 200px;
     padding: 16px;
     border: 1.5px dashed var(--border-strong);
-    border-radius: 2px;
-    background: #fffdf7;
-    color: #958b79;
-    transition: border-color 0.12s;
+    border-radius: var(--radius);
+    background: var(--surface-2);
+    color: var(--text-3);
   }
   .drop:hover {
     border-color: var(--accent);
   }
   .drop.has {
-    background: #fff repeating-conic-gradient(#f1ece0 0% 25%, transparent 0% 50%) 50% / 16px 16px;
+    background: #fff repeating-conic-gradient(#eef0f4 0% 25%, transparent 0% 50%) 50% / 16px 16px;
   }
   .drop img {
     max-width: 100%;
@@ -642,46 +597,30 @@
   }
   .drop-title {
     margin-top: 4px;
-    color: #221f1a;
-    font-size: 18px;
-    font-variation-settings: "SOFT" 100, "WONK" 1;
+    color: var(--text);
+    font-weight: 600;
   }
   .drop-sub {
     font-size: 12.5px;
   }
 
-  /* Ink pots */
   .inks {
     display: flex;
     justify-content: center;
-    gap: 18px;
-    margin-top: 14px;
+    gap: 8px;
+    margin-top: 12px;
   }
   .ink {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    padding: 0;
-    border: none;
-    background: none;
-  }
-  .pot {
     width: 22px;
     height: 22px;
+    padding: 0;
+    border: none;
     border-radius: 50%;
-    background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--c) 40%, white) 0 12%, var(--c) 45%);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-    transition: transform 0.12s;
+    background: var(--c);
+    box-shadow: 0 0 0 1px var(--border-strong);
   }
-  .ink:hover .pot {
-    transform: scale(1.1);
-  }
-  .ink.on .pot {
-    box-shadow: 0 0 0 2px var(--surface-2), 0 0 0 4px var(--c);
-  }
-  .ink.on .ink-name {
-    color: var(--text);
+  .ink.on {
+    box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent);
   }
 
   footer {
@@ -689,7 +628,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    padding: 16px 20px 18px 26px;
+    padding: 16px 18px;
   }
   .actions {
     display: flex;
@@ -708,8 +647,8 @@
     margin-top: 0;
   }
   .check input {
-    width: 16px;
-    height: 16px;
+    width: 15px;
+    height: 15px;
     margin: 0;
     accent-color: var(--accent);
   }

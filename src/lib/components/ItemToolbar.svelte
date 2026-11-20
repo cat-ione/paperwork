@@ -82,15 +82,16 @@
     display: flex;
     align-items: center;
     gap: 2px;
-    padding: 4px;
-    border-radius: 7px;
-    background: #24211c;
-    color: #efe7d6;
-    box-shadow: 0 10px 24px -8px rgba(30, 20, 5, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    padding: 3px;
+    border-radius: var(--radius);
+    background: var(--surface-2);
+    border: 1px solid var(--border-strong);
+    color: var(--text);
+    box-shadow: var(--shadow-md);
     white-space: nowrap;
     cursor: default;
     z-index: 10;
-    animation: pop-in 0.12s ease-out;
+    animation: pop-in 0.1s ease-out;
     font-family: var(--font-ui);
     font-size: 12.5px;
   }
@@ -108,41 +109,42 @@
     place-items: center;
     width: 28px;
     height: 28px;
-    border-radius: 6px;
+    border-radius: 4px;
+    color: var(--text-2);
   }
   .ib:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--surface-3);
+    color: var(--text);
   }
   .ib.danger:hover {
-    background: rgba(248, 113, 113, 0.18);
-    color: #fca5a5;
+    background: var(--danger-soft);
+    color: var(--danger);
   }
   .seg {
     display: flex;
     padding: 2px;
-    border-radius: 7px;
-    background: rgba(255, 255, 255, 0.06);
+    border-radius: 5px;
+    background: var(--surface);
   }
   .seg button {
     height: 24px;
     padding: 0 8px;
-    border-radius: 5px;
-    color: #a89d88;
+    border-radius: 4px;
+    color: var(--text-3);
     font-size: 13px;
   }
   .seg button:hover {
-    color: #fff;
+    color: var(--text);
   }
   .seg button.on {
-    background: rgba(255, 255, 255, 0.14);
-    color: #fff;
+    background: var(--surface-3);
+    color: var(--text);
   }
   .size {
     min-width: 24px;
     text-align: center;
     font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
-    font-weight: 500;
   }
   .swatch {
     width: 24px;
@@ -158,15 +160,15 @@
     height: 14px;
     border-radius: 50%;
     background: var(--c);
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25);
+    box-shadow: 0 0 0 1px var(--border-strong);
   }
   .swatch.on::before {
-    box-shadow: 0 0 0 2px #24211c, 0 0 0 3.5px #efe7d6;
+    box-shadow: 0 0 0 2px var(--surface-2), 0 0 0 3.5px var(--accent);
   }
   .sep {
     width: 1px;
     height: 18px;
-    margin: 0 4px;
-    background: rgba(255, 255, 255, 0.12);
+    margin: 0 3px;
+    background: var(--border-strong);
   }
 </style>

@@ -265,7 +265,7 @@
     display: flex;
     align-items: center;
     padding-left: 2px;
-    border-left: 2px solid #23408e;
+    border-left: 2px solid var(--accent);
     color: #111;
     font-family: Arimo, Arial, sans-serif;
     white-space: nowrap;
@@ -273,7 +273,7 @@
   .draft {
     position: absolute;
     background: #fff;
-    outline: 1.5px dashed #b8321f;
+    outline: 1.5px dashed var(--danger);
     box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.7);
   }
   .draft.hl {

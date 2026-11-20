@@ -1,4 +1,5 @@
 // Per-user preferences persisted in localStorage: saved signatures, recent files, theme.
+import { DEFAULT_THEME, THEMES } from "./themes";
 import type { SavedSignature } from "./types";
 
 function load<T>(key: string, fallback: T): T {
@@ -24,12 +25,15 @@ export interface RecentFile {
   openedAt: number;
 }
 
-export type Theme = "system" | "light" | "dark";
+function validTheme(id: string) {
+  return THEMES.some((t) => t.id === id) ? id : DEFAULT_THEME;
+}
 
 class Prefs {
   signatures = $state<SavedSignature[]>(load("paperwork.signatures", []));
   recent = $state<RecentFile[]>(load("paperwork.recent", []));
-  theme = $state<Theme>(load("paperwork.theme", "system"));
+  /** Color scheme id (see themes.ts). Unknown or legacy values fall back to the default. */
+  theme = $state<string>(validTheme(load("paperwork.theme", DEFAULT_THEME)));
   typedName = $state<string>(load("paperwork.typedName", ""));
 
   addSignature(sig: SavedSignature) {
@@ -52,7 +56,7 @@ class Prefs {
     persist("paperwork.recent", this.recent);
   }
 
-  setTheme(theme: Theme) {
+  setTheme(theme: string) {
     this.theme = theme;
     persist("paperwork.theme", theme);
   }

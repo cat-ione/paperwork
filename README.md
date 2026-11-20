@@ -10,7 +10,8 @@ A desktop PDF editor for filling out forms and signing contracts. Built with Tau
 - **Signatures and initials**: draw, type (4 handwriting fonts) or upload, saved for reuse. Clicking a signature field fits the signature into it.
 - **Add text, dates, checkmarks/crosses, whiteout and highlights** anywhere on the page. Items can be moved, resized, restyled, duplicated and deleted.
 - **Save** (keeps fields editable), **Save as**, or **Save flattened copy** (locks everything in place)
-- Undo/redo, zoom (Ctrl+wheel / pinch), page thumbnails, light/dark theme, recent files, drag & drop, "Open with" support, and a prompt when closing with unsaved changes
+- 10 color schemes (Catppuccin Mocha by default, plus Macchiato, Frappé, Latte, Rosé Pine, Rosé Pine Dawn, Gruvbox, Nord, Tokyo Night, Solarized Light)
+- Undo/redo, zoom (Ctrl+wheel / pinch), page thumbnails, recent files, drag & drop, "Open with" support, and a prompt when closing with unsaved changes
 - Password-protected and encrypted PDFs: form values are saved through pdf.js. Placed items can't be added to these files.
 
 ## Development

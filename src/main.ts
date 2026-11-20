@@ -1,7 +1,5 @@
 import { mount } from "svelte";
-// Interface type: Fraunces (display, with its SOFT/WONK axes), Instrument Sans (UI), IBM Plex Mono (labels).
-import "@fontsource-variable/fraunces/full.css";
-import "@fontsource-variable/fraunces/full-italic.css";
+// Interface type: Instrument Sans (UI) and IBM Plex Mono (labels, numbers).
 import "@fontsource-variable/instrument-sans/standard.css";
 import "@fontsource/ibm-plex-mono/400.css";
 import "@fontsource/ibm-plex-mono/500.css";
@@ -17,6 +15,11 @@ import "@fontsource/allura/400.css";
 import "@fontsource/caveat/500.css";
 import "./app.css";
 import App from "./App.svelte";
+import { prefs } from "./lib/storage.svelte";
+import { applyTheme, getTheme } from "./lib/themes";
+
+// Apply the saved color scheme before the first render so there's no flash.
+applyTheme(getTheme(prefs.theme));
 
 const app = mount(App, { target: document.getElementById("app")! });
 

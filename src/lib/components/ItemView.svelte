@@ -192,14 +192,13 @@
     transition: border-color 0.1s, background 0.1s;
   }
   .item:hover::after {
-    border-color: rgba(35, 64, 142, 0.55);
+    border-color: color-mix(in srgb, var(--accent) 55%, transparent);
   }
   .item.selected::after {
-    border: 1.5px dashed #23408e;
+    border: 1.5px dashed var(--accent);
   }
   .item.editing::after {
-    border: 1.5px solid #23408e;
-    background: rgba(243, 212, 74, 0.12);
+    border: 1.5px solid var(--accent);
   }
   .item.selected {
     z-index: 3;
@@ -222,8 +221,7 @@
     cursor: text;
   }
   .text-input::placeholder {
-    color: rgba(35, 64, 142, 0.45);
-    font-style: italic;
+    color: rgba(17, 17, 17, 0.35);
   }
   .grip {
     position: absolute;
@@ -234,8 +232,8 @@
     place-items: center;
     width: 14px;
     border-radius: 3px;
-    background: #23408e;
-    color: #fbf8f1;
+    background: var(--accent);
+    color: var(--on-accent);
   }
 
   img,
@@ -263,13 +261,13 @@
     width: 11px;
     height: 11px;
     border-radius: 50%;
-    background: #fbf8f1;
-    border: 2px solid #23408e;
+    background: #fff;
+    border: 2px solid var(--accent);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
     z-index: 1;
   }
   .handle:hover {
-    background: #23408e;
+    background: var(--accent);
   }
   .nw {
     left: -7px;

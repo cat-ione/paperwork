@@ -1,131 +1,52 @@
 /*
- * "The Notary's Desk"
- * Kraft-paper desk, cream stationery, fountain-pen blue ink, notary-red stamps.
- * Dark mode is the same desk at night: leather blotter, lamplight, brass.
+ * Design tokens. Base colors come from the active color scheme (themes.ts sets them on :root);
+ * the defaults below are Catppuccin Mocha so the first paint matches. Everything else derives.
  */
 
 :root {
   --font-ui: "Instrument Sans Variable", "Segoe UI", system-ui, sans-serif;
-  --font-display: "Fraunces Variable", Georgia, "Times New Roman", serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
-  --font-hand: "Caveat", "Segoe Print", cursive;
 
-  --desk: #e2d9c6;
+  --desk: #11111b;
+  --surface: #181825;
+  --surface-2: #1e1e2e;
+  --surface-3: #313244;
+  --border: #313244;
+  --border-strong: #45475a;
+  --text: #cdd6f4;
+  --text-2: #bac2de;
+  --text-3: #7f849c;
+  --accent: #cba6f7;
+  --on-accent: #11111b;
+  --danger: #f38ba8;
+  --success: #a6e3a1;
+  --warning: #fab387;
+  --marker: #f9e2af;
+
   --bg: var(--desk);
-  --surface: #fbf8f1;
-  --surface-2: #f4efe3;
-  --surface-3: #ebe4d3;
-  --border: #ddd3be;
-  --border-strong: #c7baa0;
-  --text: #221f1a;
-  --text-2: #5e574b;
-  --text-3: #958b79;
-  --accent: #23408e;
-  --accent-hover: #1a3274;
-  --accent-soft: #e2e6f1;
-  --accent-text: #23408e;
-  --on-accent: #fbf8f1;
-  --stamp: #b8321f;
-  --stamp-soft: #f5e0d8;
-  --danger: var(--stamp);
-  --danger-soft: var(--stamp-soft);
-  --success: #3d6b39;
-  --success-soft: #e1ead6;
-  --warning: var(--stamp);
-  --marker: #f3d44a;
-  --manila: #e6c487;
-  --manila-dark: #d4ab62;
-  --manila-edge: #b98d45;
-  --manila-ink: #3b2c10;
-  --note: #f7e07a;
+  --accent-hover: color-mix(in srgb, var(--accent) 85%, var(--text));
+  --accent-soft: color-mix(in srgb, var(--accent) 16%, var(--surface-2));
+  --accent-text: var(--accent);
+  --danger-soft: color-mix(in srgb, var(--danger) 14%, var(--surface-2));
+  --success-soft: color-mix(in srgb, var(--success) 14%, var(--surface-2));
 
-  --shadow-sm: 0 1px 0 rgba(70, 52, 22, 0.08);
-  --shadow-md: 0 1px 1px rgba(70, 52, 22, 0.08), 0 6px 16px -6px rgba(70, 52, 22, 0.22);
-  --shadow-lg: 0 2px 4px rgba(70, 52, 22, 0.08), 0 24px 48px -16px rgba(70, 52, 22, 0.4);
-  --shadow-page: 0 1px 1px rgba(70, 52, 22, 0.12), 0 2px 0 -1px #f6f2e9, 0 3px 1px -1px rgba(70, 52, 22, 0.14),
-    0 18px 30px -18px rgba(70, 52, 22, 0.45);
-  --inset: inset 0 1px 3px rgba(70, 52, 22, 0.14), inset 0 0 0 1px rgba(70, 52, 22, 0.06);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.12);
+  --shadow-md: 0 4px 14px -4px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 16px 40px -12px rgba(0, 0, 0, 0.5);
+  --shadow-page: 0 1px 3px rgba(0, 0, 0, 0.25), 0 10px 28px -12px rgba(0, 0, 0, 0.45);
 
   --radius-sm: 4px;
   --radius: 6px;
   --radius-lg: 10px;
 
-  /* Paper grain, tiled over the desk. */
-  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .27 0 0 0 0 .14 0 0 0 .11 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  /* Uneven ink for rubber stamps. */
-  --stamp-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.4' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.2 2.05'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s)'/%3E%3C/svg%3E");
-
-  color-scheme: light;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --desk: #131611;
-    --surface: #1d1b17;
-    --surface-2: #24211c;
-    --surface-3: #2d2923;
-    --border: #38332b;
-    --border-strong: #4a443a;
-    --text: #efe7d6;
-    --text-2: #b8ad98;
-    --text-3: #7e7565;
-    --accent: #d4aa58;
-    --accent-hover: #e2bb6d;
-    --accent-soft: #352d1f;
-    --accent-text: #e0bb6c;
-    --on-accent: #1d1b17;
-    --stamp: #e06a4f;
-    --stamp-soft: #3b2219;
-    --success: #9cc28a;
-    --success-soft: #24301f;
-    --manila: #8c6d3c;
-    --manila-dark: #765a2f;
-    --manila-edge: #5b4524;
-  --manila-ink: #f6e8c8;
-    --note: #d9bf55;
-    --shadow-sm: 0 1px 0 rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 1px 1px rgba(0, 0, 0, 0.3), 0 8px 18px -6px rgba(0, 0, 0, 0.6);
-    --shadow-lg: 0 2px 4px rgba(0, 0, 0, 0.3), 0 24px 50px -14px rgba(0, 0, 0, 0.8);
-    --shadow-page: 0 1px 1px rgba(0, 0, 0, 0.4), 0 2px 0 -1px #d9d4c8, 0 3px 1px -1px rgba(0, 0, 0, 0.5),
-      0 22px 40px -16px rgba(0, 0, 0, 0.85);
-    --inset: inset 0 1px 3px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(0, 0, 0, 0.25);
-    --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .6 0 0 0 0 .55 0 0 0 0 .4 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    color-scheme: dark;
-  }
-}
-
-:root[data-theme="dark"] {
-  --desk: #131611;
-  --surface: #1d1b17;
-  --surface-2: #24211c;
-  --surface-3: #2d2923;
-  --border: #38332b;
-  --border-strong: #4a443a;
-  --text: #efe7d6;
-  --text-2: #b8ad98;
-  --text-3: #7e7565;
-  --accent: #d4aa58;
-  --accent-hover: #e2bb6d;
-  --accent-soft: #352d1f;
-  --accent-text: #e0bb6c;
-  --on-accent: #1d1b17;
-  --stamp: #e06a4f;
-  --stamp-soft: #3b2219;
-  --success: #9cc28a;
-  --success-soft: #24301f;
-  --manila: #8c6d3c;
-  --manila-dark: #765a2f;
-  --manila-edge: #5b4524;
-  --manila-ink: #f6e8c8;
-  --note: #d9bf55;
-  --shadow-sm: 0 1px 0 rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 1px 1px rgba(0, 0, 0, 0.3), 0 8px 18px -6px rgba(0, 0, 0, 0.6);
-  --shadow-lg: 0 2px 4px rgba(0, 0, 0, 0.3), 0 24px 50px -14px rgba(0, 0, 0, 0.8);
-  --shadow-page: 0 1px 1px rgba(0, 0, 0, 0.4), 0 2px 0 -1px #d9d4c8, 0 3px 1px -1px rgba(0, 0, 0, 0.5),
-    0 22px 40px -16px rgba(0, 0, 0, 0.85);
-  --inset: inset 0 1px 3px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(0, 0, 0, 0.25);
-  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .6 0 0 0 0 .55 0 0 0 0 .4 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   color-scheme: dark;
+}
+
+:root[data-dark="false"] {
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 14px -4px rgba(0, 0, 0, 0.14);
+  --shadow-lg: 0 16px 40px -12px rgba(0, 0, 0, 0.25);
+  --shadow-page: 0 1px 3px rgba(0, 0, 0, 0.1), 0 10px 28px -12px rgba(0, 0, 0, 0.2);
 }
 
 *,
@@ -177,8 +98,7 @@ textarea {
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--marker) 70%, transparent);
-  color: inherit;
+  background: color-mix(in srgb, var(--accent) 35%, transparent);
 }
 
 ::-webkit-scrollbar {
@@ -186,34 +106,26 @@ textarea {
   height: 12px;
 }
 ::-webkit-scrollbar-thumb {
-  background: color-mix(in srgb, var(--text-3) 50%, transparent);
+  background: color-mix(in srgb, var(--text-3) 45%, transparent);
   border-radius: 99px;
   border: 3px solid transparent;
   background-clip: padding-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background-color: var(--text-2);
+  background-color: var(--text-3);
 }
 ::-webkit-scrollbar-track,
 ::-webkit-scrollbar-corner {
   background: transparent;
 }
 
-/* ---- Type helpers -------------------------------------------------------- */
-
 .mono-label {
   font-family: var(--font-mono);
   font-size: 10.5px;
   font-weight: 500;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-3);
-}
-
-.display {
-  font-family: var(--font-display);
-  font-variation-settings: "SOFT" 50, "WONK" 1;
-  letter-spacing: -0.01em;
 }
 
 /* ---- Buttons -------------------------------------------------------------- */
@@ -223,24 +135,18 @@ textarea {
   align-items: center;
   justify-content: center;
   gap: 7px;
-  height: 34px;
-  padding: 0 14px;
+  height: 32px;
+  padding: 0 12px;
   border-radius: var(--radius);
   border: 1px solid var(--border-strong);
-  border-bottom-width: 2px;
-  background: var(--surface);
+  background: var(--surface-2);
   color: var(--text);
   font-weight: 560;
   white-space: nowrap;
-  transition: background 0.12s, border-color 0.12s, transform 0.08s, box-shadow 0.12s;
+  transition: background 0.1s, border-color 0.1s;
 }
 .btn:hover:not(:disabled) {
-  background: var(--surface-2);
-}
-.btn:active:not(:disabled) {
-  transform: translateY(1px);
-  border-bottom-width: 1px;
-  margin-bottom: 1px;
+  background: var(--surface-3);
 }
 .btn:disabled {
   opacity: 0.45;
@@ -248,12 +154,12 @@ textarea {
 }
 .btn.primary {
   background: var(--accent);
-  border-color: color-mix(in srgb, var(--accent) 70%, black);
+  border-color: var(--accent);
   color: var(--on-accent);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
 }
 .btn.primary:hover:not(:disabled) {
   background: var(--accent-hover);
+  border-color: var(--accent-hover);
 }
 .btn.ghost {
   background: transparent;
@@ -263,11 +169,11 @@ textarea {
   background: var(--surface-3);
 }
 .btn.danger {
-  color: var(--stamp);
+  color: var(--danger);
 }
 .btn.lg {
-  height: 44px;
-  padding: 0 22px;
+  height: 40px;
+  padding: 0 18px;
   font-size: 15px;
 }
 
@@ -281,7 +187,7 @@ textarea {
   border-radius: var(--radius);
   background: transparent;
   color: var(--text-2);
-  transition: background 0.12s, color 0.12s;
+  transition: background 0.1s, color 0.1s;
 }
 .icon-btn:hover:not(:disabled) {
   background: var(--surface-3);
@@ -293,7 +199,7 @@ textarea {
 }
 .icon-btn.active {
   background: var(--accent-soft);
-  color: var(--accent-text);
+  color: var(--accent);
 }
 
 .kbd {
@@ -302,8 +208,7 @@ textarea {
   padding: 0 5px;
   border-radius: 3px;
   border: 1px solid var(--border-strong);
-  border-bottom-width: 2px;
-  background: var(--surface);
+  background: var(--surface-2);
   color: var(--text-2);
   font-family: var(--font-mono);
   font-size: 10.5px;
@@ -312,31 +217,30 @@ textarea {
   text-align: center;
 }
 
-/* ---- Popovers: a sheet of stationery ---------------------------------- */
+/* ---- Popovers ----------------------------------------------------------- */
 
 .popover {
   position: absolute;
   z-index: 50;
-  background: var(--surface) var(--grain);
+  background: var(--surface-2);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
-  padding: 6px;
-  animation: pop-in 0.14s ease-out;
+  padding: 5px;
+  animation: pop-in 0.1s ease-out;
 }
 
 .menu-item {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   width: 100%;
-  padding: 9px 10px;
+  padding: 8px 10px;
   border: none;
   border-radius: var(--radius);
   background: transparent;
   text-align: left;
   color: var(--text);
-  font-weight: 560;
 }
 .menu-item:hover {
   background: var(--surface-3);
@@ -346,16 +250,14 @@ textarea {
   font-family: var(--font-mono);
   color: var(--text-3);
   font-size: 10.5px;
-  font-weight: 400;
 }
 .menu-item .sub {
   display: block;
   color: var(--text-3);
   font-size: 12px;
-  font-weight: 400;
 }
 
-/* ---- Tooltips: a typed label ---------------------------------------- */
+/* ---- Tooltips ---------------------------------------------------------- */
 
 [data-tip] {
   position: relative;
@@ -364,21 +266,20 @@ textarea {
   content: attr(data-tip);
   position: absolute;
   left: 50%;
-  top: calc(100% + 9px);
+  top: calc(100% + 8px);
   translate: -50% -2px;
-  padding: 4px 8px 3px;
-  border-radius: 3px;
+  padding: 3px 7px;
+  border-radius: 4px;
   background: var(--text);
   color: var(--surface);
   font-family: var(--font-mono);
   font-size: 10.5px;
   font-weight: 500;
-  letter-spacing: 0.04em;
   line-height: 1.4;
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.12s, translate 0.12s;
+  transition: opacity 0.1s, translate 0.1s;
   z-index: 200;
 }
 [data-tip]:hover::after {
@@ -388,7 +289,7 @@ textarea {
 }
 .zoombar [data-tip]::after {
   top: auto;
-  bottom: calc(100% + 12px);
+  bottom: calc(100% + 10px);
 }
 
 /* ---- Motion -------------------------------------------------------------- */
@@ -396,28 +297,13 @@ textarea {
 @keyframes pop-in {
   from {
     opacity: 0;
-    transform: translateY(-4px) rotate(-0.4deg);
+    transform: translateY(-3px);
   }
 }
 
 @keyframes fade-in {
   from {
     opacity: 0;
-  }
-}
-
-@keyframes stamp-in {
-  0% {
-    opacity: 0;
-    transform: scale(1.8) rotate(var(--rot, -8deg));
-  }
-  60% {
-    opacity: 1;
-    transform: scale(0.94) rotate(var(--rot, -8deg));
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1) rotate(var(--rot, -8deg));
   }
 }
 
