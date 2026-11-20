@@ -3,7 +3,7 @@
   import { editor } from "../editor.svelte";
   import { inTauri } from "../platform";
   import { prefs } from "../storage.svelte";
-  import { applyTheme, getTheme, THEMES } from "../themes";
+  import { getTheme, THEMES } from "../themes";
 
   let { onOpen, onOpenPath }: { onOpen: () => void; onOpenPath: (path: string) => void } = $props();
 
@@ -140,7 +140,7 @@
 
         <section class="box">
           <h2 class="box-title">color scheme <span class="dim">· <span class="k">t</span> to cycle</span></h2>
-          <ul class="themes" role="listbox" aria-label="Color scheme" onmouseleave={() => applyTheme(current)}>
+          <ul class="themes" role="listbox" aria-label="Color scheme">
             {#each THEMES as t (t.id)}
               <li>
                 <button
@@ -148,9 +148,6 @@
                   class:on={prefs.theme === t.id}
                   role="option"
                   aria-selected={prefs.theme === t.id}
-                  onmouseenter={() => applyTheme(t)}
-                  onfocus={() => applyTheme(t)}
-                  onblur={() => applyTheme(current)}
                   onclick={() => prefs.setTheme(t.id)}
                 >
                   <span class="chips" style:background={t.desk}>
