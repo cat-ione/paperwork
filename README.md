@@ -2,6 +2,8 @@
 
 A desktop PDF editor for filling out forms and signing contracts. Built with Tauri 2, Svelte 5, pdf.js (rendering) and pdf-lib (saving).
 
+**[Download](https://github.com/cat-ione/paperwork/releases/latest)** for Windows, macOS or Linux, or **[try it in your browser](https://cat-ione.github.io/paperwork/)**.
+
 ## Features
 
 - **Fill form fields**: text, multiline, comb, checkboxes, radio buttons, dropdowns and list boxes, with a progress panel and "next empty field" navigation
@@ -21,6 +23,16 @@ pnpm check          # type-check
 ```
 
 `pnpm dev` also runs the UI in a plain browser. There, saving downloads the file.
+
+## Releasing
+
+Bump the version in `package.json`, `src-tauri/tauri.conf.json` and `src-tauri/Cargo.toml`, then push a tag:
+
+```sh
+git tag v0.2.0 && git push origin v0.2.0
+```
+
+The release workflow builds installers for Windows, macOS (Apple Silicon and Intel) and Linux and publishes them as a GitHub release. Each push to `main` also redeploys the browser version to GitHub Pages.
 
 ## Keyboard shortcuts
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { CalendarDays, Clock, FileText, FolderOpen, LoaderCircle, PenLine, TextCursorInput, X } from "@lucide/svelte";
+  import { CalendarDays, Clock, Download, FileText, FolderOpen, LoaderCircle, PenLine, TextCursorInput, X } from "@lucide/svelte";
   import { editor } from "../editor.svelte";
   import { inTauri } from "../platform";
   import { prefs } from "../storage.svelte";
@@ -58,6 +58,17 @@
         <div><b>Dates &amp; checkmarks</b><span>Add text, dates and ticks in one click</span></div>
       </div>
     </div>
+
+    {#if !inTauri}
+      <a class="desktop" href="https://github.com/cat-ione/paperwork/releases/latest" target="_blank" rel="noreferrer">
+        <span class="f-icon"><Download size={18} /></span>
+        <div>
+          <b>Get the desktop app</b>
+          <span>Save straight back to your files. Free for Windows, macOS and Linux.</span>
+        </div>
+      </a>
+      <p class="privacy">Your files never leave your device. Everything runs locally in your browser.</p>
+    {/if}
 
     {#if inTauri && prefs.recent.length}
       <section class="recent">
@@ -192,6 +203,39 @@
     background: var(--surface-2);
     color: var(--accent-text);
     border: 1px solid var(--border);
+  }
+
+  .desktop {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+    padding: 14px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: inherit;
+    text-decoration: none;
+    font-size: 12.5px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .desktop:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-soft);
+  }
+  .desktop b {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .desktop span:not(.f-icon) {
+    color: var(--text-3);
+  }
+  .privacy {
+    margin: 14px 0 0;
+    text-align: center;
+    color: var(--text-3);
+    font-size: 12px;
   }
 
   .recent {

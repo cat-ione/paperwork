@@ -4,6 +4,8 @@ import { svelte } from "@sveltejs/vite-plugin-svelte";
 const host = process.env.TAURI_DEV_HOST;
 
 export default defineConfig({
+  // GitHub Pages serves the web build from /<repo>/; the desktop app uses the root.
+  base: process.env.BASE_PATH ?? "/",
   plugins: [svelte()],
   clearScreen: false,
   server: {
