@@ -1,0 +1,25 @@
+<script lang="ts">
+  let { size = 28 }: { size?: number } = $props();
+</script>
+
+<svg width={size} height={size} viewBox="0 0 1024 1024" aria-hidden="true">
+  <defs>
+    <linearGradient id="logo-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6366f1" />
+      <stop offset="1" stop-color="#8b5cf6" />
+    </linearGradient>
+  </defs>
+  <rect x="32" y="32" width="960" height="960" rx="220" fill="url(#logo-bg)" />
+  <path d="M332 232h260l140 140v400a40 40 0 0 1-40 40H332a40 40 0 0 1-40-40V272a40 40 0 0 1 40-40z" fill="#fff" />
+  <path d="M592 232v100a40 40 0 0 0 40 40h100z" fill="#c7d2fe" />
+  <rect x="362" y="430" width="300" height="28" rx="14" fill="#c7d2fe" />
+  <rect x="362" y="500" width="220" height="28" rx="14" fill="#c7d2fe" />
+  <path
+    d="M370 690c40-60 70-90 90-70s-30 70 0 60 50-70 80-50 10 50 40 40 40-30 80-30"
+    fill="none"
+    stroke="#6366f1"
+    stroke-width="26"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>
